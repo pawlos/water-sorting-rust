@@ -5,7 +5,7 @@ pub enum Color {
     Blue,
     Red,
     Gray,
-    Orange
+    Orange,
 }
 
 impl Debug for Color {
@@ -23,18 +23,33 @@ struct Bottle {
     bottom: Option<Color>,
     l1: Option<Color>,
     l2: Option<Color>,
-    top: Option<Color>
+    top: Option<Color>,
 }
 
 impl Debug for Bottle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Bottle").field("bottom", &self.bottom).field("l1", &self.l1).field("l2", &self.l2).field("top", &self.top).finish()
+        f.debug_struct("Bottle")
+            .field("bottom", &self.bottom)
+            .field("l1", &self.l1)
+            .field("l2", &self.l2)
+            .field("top", &self.top)
+            .finish()
     }
 }
 
 impl Bottle {
-    pub fn new(bottom: Option<Color>, l1: Option<Color>, l2: Option<Color>, top: Option<Color>) -> Self {
-        Bottle { bottom: bottom, l1: l1, l2: l2, top: top }
+    pub fn new(
+        bottom: Option<Color>,
+        l1: Option<Color>,
+        l2: Option<Color>,
+        top: Option<Color>,
+    ) -> Self {
+        Bottle {
+            bottom: bottom,
+            l1: l1,
+            l2: l2,
+            top: top,
+        }
     }
 
     pub fn top_color(self: &Self) -> Option<Color> {
@@ -43,7 +58,7 @@ impl Bottle {
             (None, None, None, s) => s,
             (None, None, s, _) => s,
             (None, s, _, _) => s,
-            (s, _, _, _) => s
+            (s, _, _, _) => s,
         }
     }
 
@@ -53,17 +68,29 @@ impl Bottle {
             (None, None, None, _) => self.bottom = None,
             (None, None, _, _) => self.l1 = None,
             (None, _, _, _) => self.l2 = None,
-            (_, _, _, _) => self.top = None
+            (_, _, _, _) => self.top = None,
         };
     }
 
     pub fn pour(&mut self, c: Color) -> bool {
         let w = match (self.top, self.l2, self.l1, self.bottom) {
-            (None, None, None, None) => { self.bottom = Option::Some(c); true},
-            (None, None, None, Some(s)) if s == c => {self.l1 = Option::Some(c); true},
-            (None, None, Some(s), Some(_)) if s == c => {self.l2 = Option::Some(c); true},
-            (None, Some(s), Some(_), Some(_)) if s == c => {self.top = Option::Some(c); true},
-            _ => false
+            (None, None, None, None) => {
+                self.bottom = Option::Some(c);
+                true
+            }
+            (None, None, None, Some(s)) if s == c => {
+                self.l1 = Option::Some(c);
+                true
+            }
+            (None, None, Some(s), Some(_)) if s == c => {
+                self.l2 = Option::Some(c);
+                true
+            }
+            (None, Some(s), Some(_), Some(_)) if s == c => {
+                self.top = Option::Some(c);
+                true
+            }
+            _ => false,
         };
 
         w
@@ -72,36 +99,38 @@ impl Bottle {
     pub fn empty_or_one_color(self) -> bool {
         match (self.bottom, self.l1, self.l2, self.top) {
             (None, None, None, None) => true,
-            (Some(t), Some(l2), Some(l1), Some(bottom)) if t == l2 && l2 == l1 && l1 == bottom => true,
+            (Some(t), Some(l2), Some(l1), Some(bottom)) if t == l2 && l2 == l1 && l1 == bottom => {
+                true
+            }
             (Some(t), Some(l2), Some(l1), None) if t == l2 && l2 == l1 => true,
             (Some(t), Some(l2), None, None) if t == l2 => true,
             (Some(_), None, None, None) => true,
-            _ => false
+            _ => false,
         }
     }
 }
 
-struct WaterSorting
-{
-    bottles: Vec<Bottle>
+struct WaterSorting {
+    bottles: Vec<Bottle>,
 }
 
 impl Debug for WaterSorting {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WaterSorting").field("bottles", &self.bottles).finish()
+        f.debug_struct("WaterSorting")
+            .field("bottles", &self.bottles)
+            .finish()
     }
 }
 
 impl WaterSorting {
     pub fn new(count: usize) -> Self {
         WaterSorting {
-            bottles: Vec::with_capacity(count)
+            bottles: Vec::with_capacity(count),
         }
     }
 
     pub fn pour(&mut self, from: u8, to: u8) {
-        loop
-        {
+        loop {
             let from_b = self.bottles[from as usize].top_color();
             if from_b == None {
                 break;
@@ -116,7 +145,7 @@ impl WaterSorting {
     }
 
     pub fn win(self) -> bool {
-        self.bottles.into_iter().all(|b| {b.empty_or_one_color()})
+        self.bottles.into_iter().all(|b| b.empty_or_one_color())
     }
 
     pub fn init_bottle(&mut self, c: Option<Color>, c1: Option<Color>, c2: Option<Color>) {
@@ -124,19 +153,17 @@ impl WaterSorting {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::WaterSorting;
-    use crate::Color;
     use crate::Bottle;
+    use crate::Color;
+    use crate::WaterSorting;
 
     #[test]
     fn pour_works_on_one_level() {
         let mut w = WaterSorting::new(2);
         w.init_bottle(Some(Color::Blue), None, None);
         w.init_bottle(Some(Color::Orange), Some(Color::Blue), None);
-
 
         w.pour(1, 0);
 
@@ -195,13 +222,23 @@ mod tests {
 
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_middle_levels() {
-        let b = Bottle::new(Some(Color::Blue), Some(Color::Orange), Some(Color::Blue), None);
+        let b = Bottle::new(
+            Some(Color::Blue),
+            Some(Color::Orange),
+            Some(Color::Blue),
+            None,
+        );
         assert!(b.empty_or_one_color() == false)
     }
 
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_top_levels() {
-        let b = Bottle::new(Some(Color::Blue), Some(Color::Blue), Some(Color::Orange), Some(Color::Blue));
+        let b = Bottle::new(
+            Some(Color::Blue),
+            Some(Color::Blue),
+            Some(Color::Orange),
+            Some(Color::Blue),
+        );
         assert!(b.empty_or_one_color() == false)
     }
 
