@@ -2,19 +2,29 @@ use core::fmt::Debug;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum Color {
+    Empty,
     Blue,
     Red,
     Gray,
     Orange,
+    Brown,
+    Yellow,
+    Green,
+    Magenta,
 }
 
 impl Debug for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Blue => write!(f, "B"),
-            Self::Red => write!(f, "R"),
-            Self::Gray => write!(f, "G"),
-            Self::Orange => write!(f, "O"),
+            Self::Blue => write!(f, "🟦"),
+            Self::Red => write!(f, "🟥"),
+            Self::Gray => write!(f, "🔳"),
+            Self::Orange => write!(f, "🟧"),
+            Self::Brown => write!(f, "🟫"),
+            Self::Yellow => write!(f, "🟨"),
+            Self::Green => write!(f, "🟩"),
+            Self::Magenta => write!(f, "🟪"),
+            Self::Empty => write!(f, ""),
         }
     }
 }
@@ -28,12 +38,14 @@ struct Bottle {
 
 impl Debug for Bottle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Bottle")
-            .field("bottom", &self.bottom)
-            .field("l1", &self.l1)
-            .field("l2", &self.l2)
-            .field("top", &self.top)
-            .finish()
+        write!(
+            f,
+            "{:#?}{:#?}{:#?}{:#?}",
+            self.bottom.unwrap_or(Color::Empty),
+            self.l1.unwrap_or(Color::Empty),
+            self.l2.unwrap_or(Color::Empty),
+            self.top.unwrap_or(Color::Empty)
+        )
     }
 }
 
