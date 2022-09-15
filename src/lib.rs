@@ -324,4 +324,32 @@ mod tests {
 
         assert!(w.move_available() == false)
     }
+
+    #[test]
+    fn solve_real_game() {
+        let mut w = WaterSorting::new(2);
+        w.init_bottle(
+            Some(Color::Green),
+            Some(Color::Red),
+            Some(Color::Green),
+            Some(Color::Red),
+        );
+        w.init_bottle(
+            Some(Color::Red),
+            Some(Color::Green),
+            Some(Color::Red),
+            Some(Color::Green),
+        );
+        w.init_bottle(None, None, None, None);
+
+        w.pour(1, 2);
+        w.pour(0, 1);
+        w.pour(0, 2);
+        w.pour(1, 0);
+        w.pour(1, 2);
+        w.pour(0, 1);
+        w.pour(2, 0);
+
+        assert!(w.win() == true);
+    }
 }
