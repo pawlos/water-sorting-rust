@@ -29,6 +29,7 @@ impl Debug for Color {
     }
 }
 
+#[derive(PartialEq)]
 struct Bottle {
     bottom: Option<Color>,
     l1: Option<Color>,
@@ -57,21 +58,21 @@ impl Bottle {
         top: Option<Color>,
     ) -> Self {
         Bottle {
-            bottom: bottom,
-            l1: l1,
-            l2: l2,
-            top: top,
+            bottom,
+            l1,
+            l2,
+            top,
         }
     }
 
-    pub fn empty(self: &Self) -> bool {
-        match (self.bottom, self.l1, self.l2, self.top) {
-            (None, None, None, None) => true,
-            _ => false,
-        }
+    pub fn empty(&self) -> bool {
+        matches!(
+            (self.bottom, self.l1, self.l2, self.top),
+            (None, None, None, None)
+        )
     }
 
-    pub fn top_color(self: &Self) -> Option<Color> {
+    pub fn top_color(&self) -> Option<Color> {
         match (self.top, self.l2, self.l1, self.bottom) {
             (None, None, None, None) => None,
             (None, None, None, s) => s,
@@ -92,7 +93,7 @@ impl Bottle {
     }
 
     pub fn pour(&mut self, c: Color) -> bool {
-        let w = match (self.top, self.l2, self.l1, self.bottom) {
+        match (self.top, self.l2, self.l1, self.bottom) {
             (None, None, None, None) => {
                 self.bottom = Option::Some(c);
                 true
@@ -110,9 +111,7 @@ impl Bottle {
                 true
             }
             _ => false,
-        };
-
-        w
+        }
     }
 
     pub fn empty_or_one_color(self) -> bool {
@@ -142,9 +141,9 @@ impl Debug for WaterSorting {
 }
 
 impl WaterSorting {
-    pub fn new(count: usize) -> Self {
+    pub fn new() -> Self {
         WaterSorting {
-            bottles: Vec::with_capacity(count),
+            bottles: Vec::with_capacity(4),
         }
     }
 
@@ -184,7 +183,16 @@ impl WaterSorting {
         if self.bottles.iter().all(|b| !b.empty()) {
             return false;
         }
-        return true;
+        true
+    }
+
+    pub fn bottle_index(self, b: &Bottle) -> Option<usize> {
+        self.bottles.iter().position(|pb| pb == b)
+    }
+
+    pub fn solve(&mut self) -> bool {
+        for _b in self.bottles.as_slice() {}
+        true
     }
 }
 
@@ -196,35 +204,35 @@ mod tests {
 
     #[test]
     fn pour_works_on_one_level() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
         w.init_bottle(Some(Color::Blue), None, None, None);
         w.init_bottle(Some(Color::Orange), Some(Color::Blue), None, None);
 
         w.pour(1, 0);
 
-        assert!(w.bottles[0].bottom.unwrap() == Color::Blue);
+        assert!(w.bottles[0].bottom == Some(Color::Blue));
         assert!(w.bottles[1].l1 == None);
-        assert!(w.bottles[1].bottom.unwrap() == Color::Orange);
+        assert!(w.bottles[1].bottom == Some(Color::Orange));
     }
 
     #[test]
     fn pour_works_on_multiple_levels() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
         w.init_bottle(Some(Color::Blue), None, None, None);
         w.init_bottle(Some(Color::Blue), Some(Color::Blue), None, None);
 
         w.pour(1, 0);
 
-        assert!(w.bottles[0].bottom.unwrap() == Color::Blue);
-        assert!(w.bottles[0].l1.unwrap() == Color::Blue);
-        assert!(w.bottles[0].l2.unwrap() == Color::Blue);
+        assert!(w.bottles[0].bottom == Some(Color::Blue));
+        assert!(w.bottles[0].l1 == Some(Color::Blue));
+        assert!(w.bottles[0].l2 == Some(Color::Blue));
         assert!(w.bottles[1].l1 == None);
         assert!(w.bottles[1].bottom == None);
     }
 
     #[test]
     fn pour_works_on_multiple_levels_with_different_bottom_one() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
         w.init_bottle(Some(Color::Blue), None, None, None);
         w.init_bottle(
             Some(Color::Orange),
@@ -235,11 +243,11 @@ mod tests {
 
         w.pour(1, 0);
 
-        assert!(w.bottles[0].bottom.unwrap() == Color::Blue);
-        assert!(w.bottles[0].l1.unwrap() == Color::Blue);
-        assert!(w.bottles[0].l2.unwrap() == Color::Blue);
+        assert!(w.bottles[0].bottom == Some(Color::Blue));
+        assert!(w.bottles[0].l1 == Some(Color::Blue));
+        assert!(w.bottles[0].l2 == Some(Color::Blue));
         assert!(w.bottles[1].l1 == None);
-        assert!(w.bottles[1].bottom.unwrap() == Color::Orange);
+        assert!(w.bottles[1].bottom == Some(Color::Orange));
     }
 
     #[test]
@@ -284,7 +292,7 @@ mod tests {
 
     #[test]
     fn game_is_won_if_all_bottles_are_sorted() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
         w.init_bottle(Some(Color::Blue), None, None, None);
         w.init_bottle(
             Some(Color::Orange),
@@ -299,7 +307,7 @@ mod tests {
     }
     #[test]
     fn if_there_is_an_empty_bottle_move_is_available() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
         w.init_bottle(None, None, None, None);
 
         assert!(w.move_available() == true)
@@ -307,7 +315,7 @@ mod tests {
 
     #[test]
     fn if_there_are_all_full_bottles_move_is_not_available() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
 
         w.init_bottle(
             Some(Color::Blue),
@@ -327,7 +335,7 @@ mod tests {
 
     #[test]
     fn solve_real_game() {
-        let mut w = WaterSorting::new(2);
+        let mut w = WaterSorting::new();
         w.init_bottle(
             Some(Color::Green),
             Some(Color::Red),
@@ -349,6 +357,42 @@ mod tests {
         w.pour(1, 2);
         w.pour(0, 1);
         w.pour(2, 0);
+
+        assert!(w.win() == true);
+    }
+
+    #[test]
+    fn pour_as_much_as_possible() {
+        let mut w = WaterSorting::new();
+        w.init_bottle(Some(Color::Green), Some(Color::Red), Some(Color::Red), None);
+        w.init_bottle(Some(Color::Green), Some(Color::Red), Some(Color::Red), None);
+
+        w.pour(0, 1);
+
+        let b1 = w.bottles.get(0).unwrap();
+        let b2 = w.bottles.get(1).unwrap();
+
+        println!("{:?}", w);
+    }
+
+    #[test]
+    fn solve_automatically() {
+        let mut w = WaterSorting::new();
+        w.init_bottle(
+            Some(Color::Green),
+            Some(Color::Red),
+            Some(Color::Green),
+            Some(Color::Red),
+        );
+        w.init_bottle(
+            Some(Color::Red),
+            Some(Color::Green),
+            Some(Color::Red),
+            Some(Color::Green),
+        );
+        w.init_bottle(None, None, None, None);
+
+        w.solve();
 
         assert!(w.win() == true);
     }
