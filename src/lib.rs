@@ -150,7 +150,7 @@ impl WaterSorting {
     pub fn pour(&mut self, from: u8, to: u8) {
         loop {
             let from_b = self.bottles[from as usize].top_color();
-            if from_b == None {
+            if from_b.is_none() {
                 break;
             }
             let to_b = &mut self.bottles[to as usize];
