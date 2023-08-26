@@ -211,7 +211,7 @@ mod tests {
         w.pour(1, 0);
 
         assert!(w.bottles[0].bottom == Some(Color::Blue));
-        assert!(w.bottles[1].l1 == None);
+        assert!(w.bottles[1].l1.is_none());
         assert!(w.bottles[1].bottom == Some(Color::Orange));
     }
 
@@ -226,8 +226,8 @@ mod tests {
         assert!(w.bottles[0].bottom == Some(Color::Blue));
         assert!(w.bottles[0].l1 == Some(Color::Blue));
         assert!(w.bottles[0].l2 == Some(Color::Blue));
-        assert!(w.bottles[1].l1 == None);
-        assert!(w.bottles[1].bottom == None);
+        assert!(w.bottles[1].l1.is_none());
+        assert!(w.bottles[1].bottom.is_none());
     }
 
     #[test]
@@ -246,26 +246,26 @@ mod tests {
         assert!(w.bottles[0].bottom == Some(Color::Blue));
         assert!(w.bottles[0].l1 == Some(Color::Blue));
         assert!(w.bottles[0].l2 == Some(Color::Blue));
-        assert!(w.bottles[1].l1 == None);
+        assert!(w.bottles[1].l1.is_none());
         assert!(w.bottles[1].bottom == Some(Color::Orange));
     }
 
     #[test]
     fn bottle_is_sorted_if_only_one_color_on_one_level() {
         let b = Bottle::new(Some(Color::Blue), None, None, None);
-        assert!(b.empty_or_one_color() == true)
+        assert!(b.empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_sorted_if_only_one_color_is_one_two_levels() {
         let b = Bottle::new(Some(Color::Blue), Some(Color::Blue), None, None);
-        assert!(b.empty_or_one_color() == true)
+        assert!(b.empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_bottom_levels() {
         let b = Bottle::new(Some(Color::Blue), Some(Color::Orange), None, None);
-        assert!(b.empty_or_one_color() == false)
+        assert!(!b.empty_or_one_color())
     }
 
     #[test]
@@ -276,7 +276,7 @@ mod tests {
             Some(Color::Blue),
             None,
         );
-        assert!(b.empty_or_one_color() == false)
+        assert!(!b.empty_or_one_color())
     }
 
     #[test]
@@ -287,7 +287,7 @@ mod tests {
             Some(Color::Orange),
             Some(Color::Blue),
         );
-        assert!(b.empty_or_one_color() == false)
+        assert!(!b.empty_or_one_color())
     }
 
     #[test]
@@ -303,14 +303,14 @@ mod tests {
 
         w.pour(1, 0);
 
-        assert!(w.win() == true)
+        assert!(w.win())
     }
     #[test]
     fn if_there_is_an_empty_bottle_move_is_available() {
         let mut w = WaterSorting::new();
         w.init_bottle(None, None, None, None);
 
-        assert!(w.move_available() == true)
+        assert!(w.move_available())
     }
 
     #[test]
@@ -330,7 +330,7 @@ mod tests {
             Some(Color::Green),
         );
 
-        assert!(w.move_available() == false)
+        assert!(!w.move_available())
     }
 
     #[test]
@@ -358,7 +358,7 @@ mod tests {
         w.pour(0, 1);
         w.pour(2, 0);
 
-        assert!(w.win() == true);
+        assert!(w.win());
     }
 
     #[test]
@@ -394,6 +394,6 @@ mod tests {
 
         w.solve();
 
-        assert!(w.win() == true);
+        assert!(w.win());
     }
 }
