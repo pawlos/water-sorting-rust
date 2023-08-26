@@ -372,7 +372,14 @@ mod tests {
         let b1 = w.bottles.get(0).unwrap();
         let b2 = w.bottles.get(1).unwrap();
 
-        println!("{:?}", w);
+        assert!(b1.bottom == Some(Color::Green));
+        assert!(b1.l1 == Some(Color::Red));
+        assert!(b1.l2.is_none());
+        assert!(b1.top.is_none());
+        assert!(b2.bottom == Some(Color::Green));
+        assert!(b2.l1 == Some(Color::Red));
+        assert!(b2.l2 == Some(Color::Red));
+        assert!(b2.top == Some(Color::Red));
     }
 
     #[test]
