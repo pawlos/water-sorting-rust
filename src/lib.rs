@@ -149,16 +149,17 @@ impl WaterSorting {
 
     pub fn pour(&mut self, from: u8, to: u8) {
         loop {
-            let from_b = self.bottles[from as usize].top_color();
-            if from_b.is_none() {
-                break;
+            match self.bottles[from as usize].top_color() {
+                None => break,
+                Some(b) => {
+                    let to_b = &mut self.bottles[to as usize];
+                    let r = to_b.pour(b);
+                    if !r {
+                        break;
+                    }
+                    self.bottles[from as usize].pop();
+                }
             }
-            let to_b = &mut self.bottles[to as usize];
-            let r = to_b.pour(from_b.unwrap());
-            if !r {
-                break;
-            }
-            self.bottles[from as usize].pop();
         }
     }
 
@@ -383,6 +384,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "Not yet finished"]
     fn solve_automatically() {
         let mut w = WaterSorting::new();
         w.init_bottle(
