@@ -65,7 +65,15 @@ impl Bottle {
         }
     }
 
-    pub fn empty(&self) -> bool {
+    pub fn empty() -> Self {
+        Bottle { bottom: None, l1: None, l2: None, top: None }
+    }
+
+    pub fn with_one_color(c: Color) -> Self {
+        Bottle { bottom: Some(c), l1: None, l2: None, top: None }
+    }
+
+    pub fn is_empty(&self) -> bool {
         matches!(
             (self.bottom, self.l1, self.l2, self.top),
             (None, None, None, None)
@@ -177,11 +185,19 @@ impl WaterSorting {
         self.bottles.push(Bottle::new(c, c1, c2, top));
     }
 
+    pub fn init_empty_bottle(&mut self) {
+        self.bottles.push(Bottle::empty())
+    }
+
+    pub fn init_bottle_with_one_color(&mut self, c: Color) {
+        self.bottles.push(Bottle::with_one_color(c))
+    }
+
     pub fn move_available(self) -> bool {
-        if self.bottles.iter().any(|b| b.empty()) {
+        if self.bottles.iter().any(|b| b.is_empty()) {
             return true;
         }
-        if self.bottles.iter().all(|b| !b.empty()) {
+        if self.bottles.iter().all(|b| !b.is_empty()) {
             return false;
         }
         true
@@ -206,7 +222,7 @@ mod tests {
     #[test]
     fn pour_works_on_one_level() {
         let mut w = WaterSorting::new();
-        w.init_bottle(Some(Color::Blue), None, None, None);
+        w.init_bottle_with_one_color(Color::Blue);
         w.init_bottle(Some(Color::Orange), Some(Color::Blue), None, None);
 
         w.pour(1, 0);
@@ -219,7 +235,7 @@ mod tests {
     #[test]
     fn pour_works_on_multiple_levels() {
         let mut w = WaterSorting::new();
-        w.init_bottle(Some(Color::Blue), None, None, None);
+        w.init_bottle_with_one_color(Color::Blue);
         w.init_bottle(Some(Color::Blue), Some(Color::Blue), None, None);
 
         w.pour(1, 0);
@@ -234,7 +250,7 @@ mod tests {
     #[test]
     fn pour_works_on_multiple_levels_with_different_bottom_one() {
         let mut w = WaterSorting::new();
-        w.init_bottle(Some(Color::Blue), None, None, None);
+        w.init_bottle_with_one_color(Color::Blue);
         w.init_bottle(
             Some(Color::Orange),
             Some(Color::Blue),
@@ -253,7 +269,7 @@ mod tests {
 
     #[test]
     fn bottle_is_sorted_if_only_one_color_on_one_level() {
-        let b = Bottle::new(Some(Color::Blue), None, None, None);
+        let b = Bottle::with_one_color(Color::Blue);
         assert!(b.empty_or_one_color())
     }
 
@@ -294,7 +310,7 @@ mod tests {
     #[test]
     fn game_is_won_if_all_bottles_are_sorted() {
         let mut w = WaterSorting::new();
-        w.init_bottle(Some(Color::Blue), None, None, None);
+        w.init_bottle_with_one_color(Color::Blue);
         w.init_bottle(
             Some(Color::Orange),
             Some(Color::Blue),
@@ -309,7 +325,7 @@ mod tests {
     #[test]
     fn if_there_is_an_empty_bottle_move_is_available() {
         let mut w = WaterSorting::new();
-        w.init_bottle(None, None, None, None);
+        w.init_empty_bottle();
 
         assert!(w.move_available())
     }
@@ -349,7 +365,7 @@ mod tests {
             Some(Color::Red),
             Some(Color::Green),
         );
-        w.init_bottle(None, None, None, None);
+        w.init_empty_bottle();
 
         w.pour(1, 2);
         w.pour(0, 1);
@@ -399,7 +415,7 @@ mod tests {
             Some(Color::Red),
             Some(Color::Green),
         );
-        w.init_bottle(None, None, None, None);
+        w.init_empty_bottle();
 
         w.solve();
 
