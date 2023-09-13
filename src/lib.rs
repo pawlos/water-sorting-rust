@@ -95,19 +95,19 @@ impl Bottle {
     pub fn pour(&mut self, c: Color) -> bool {
         match (self.top, self.l2, self.l1, self.bottom) {
             (None, None, None, None) => {
-                self.bottom = Option::Some(c);
+                self.bottom = Some(c);
                 true
             }
             (None, None, None, Some(s)) if s == c => {
-                self.l1 = Option::Some(c);
+                self.l1 = Some(c);
                 true
             }
             (None, None, Some(s), Some(_)) if s == c => {
-                self.l2 = Option::Some(c);
+                self.l2 = Some(c);
                 true
             }
             (None, Some(s), Some(_), Some(_)) if s == c => {
-                self.top = Option::Some(c);
+                self.top = Some(c);
                 true
             }
             _ => false,
@@ -211,9 +211,9 @@ mod tests {
 
         w.pour(1, 0);
 
-        assert!(w.bottles[0].bottom == Some(Color::Blue));
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
         assert!(w.bottles[1].l1.is_none());
-        assert!(w.bottles[1].bottom == Some(Color::Orange));
+        assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
     }
 
     #[test]
@@ -224,9 +224,9 @@ mod tests {
 
         w.pour(1, 0);
 
-        assert!(w.bottles[0].bottom == Some(Color::Blue));
-        assert!(w.bottles[0].l1 == Some(Color::Blue));
-        assert!(w.bottles[0].l2 == Some(Color::Blue));
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
+        assert_eq!(w.bottles[0].l1, Some(Color::Blue));
+        assert_eq!(w.bottles[0].l2, Some(Color::Blue));
         assert!(w.bottles[1].l1.is_none());
         assert!(w.bottles[1].bottom.is_none());
     }
