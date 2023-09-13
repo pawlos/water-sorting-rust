@@ -244,11 +244,11 @@ mod tests {
 
         w.pour(1, 0);
 
-        assert!(w.bottles[0].bottom == Some(Color::Blue));
-        assert!(w.bottles[0].l1 == Some(Color::Blue));
-        assert!(w.bottles[0].l2 == Some(Color::Blue));
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
+        assert_eq!(w.bottles[0].l1, Some(Color::Blue));
+        assert_eq!(w.bottles[0].l2, Some(Color::Blue));
         assert!(w.bottles[1].l1.is_none());
-        assert!(w.bottles[1].bottom == Some(Color::Orange));
+        assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
     }
 
     #[test]
@@ -373,14 +373,14 @@ mod tests {
         let b1 = w.bottles.get(0).unwrap();
         let b2 = w.bottles.get(1).unwrap();
 
-        assert!(b1.bottom == Some(Color::Green));
-        assert!(b1.l1 == Some(Color::Red));
+        assert_eq!(b1.bottom, Some(Color::Green));
+        assert_eq!(b1.l1, Some(Color::Red));
         assert!(b1.l2.is_none());
         assert!(b1.top.is_none());
-        assert!(b2.bottom == Some(Color::Green));
-        assert!(b2.l1 == Some(Color::Red));
-        assert!(b2.l2 == Some(Color::Red));
-        assert!(b2.top == Some(Color::Red));
+        assert_eq!(b2.bottom, Some(Color::Green));
+        assert_eq!(b2.l1, Some(Color::Red));
+        assert_eq!(b2.l2, Some(Color::Red));
+        assert_eq!(b2.top, Some(Color::Red));
     }
 
     #[test]
