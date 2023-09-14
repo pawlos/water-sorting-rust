@@ -125,11 +125,11 @@ impl Bottle {
     pub fn empty_or_one_color(self) -> bool {
         match (self.bottom, self.l1, self.l2, self.top) {
             (None, None, None, None) => true,
-            (Some(t), Some(l2), Some(l1), Some(bottom)) if t == l2 && l2 == l1 && l1 == bottom => {
+            (Some(b), Some(l1), Some(l2), Some(t)) if t == l2 && l2 == l1 && l1 == b => {
                 true
             }
-            (Some(t), Some(l2), Some(l1), None) if t == l2 && l2 == l1 => true,
-            (Some(t), Some(l2), None, None) if t == l2 => true,
+            (Some(b), Some(l1), Some(l2), None) if b == l2 && l2 == l1 => true,
+            (Some(b), Some(l1), None, None) if b == l1 => true,
             (Some(_), None, None, None) => true,
             _ => false,
         }
