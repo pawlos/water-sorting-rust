@@ -122,12 +122,10 @@ impl Bottle {
         }
     }
 
-    pub fn empty_or_one_color(self) -> bool {
+    pub fn is_empty_or_one_color(&self) -> bool {
         match (self.bottom, self.l1, self.l2, self.top) {
             (None, None, None, None) => true,
-            (Some(b), Some(l1), Some(l2), Some(t)) if t == l2 && l2 == l1 && l1 == b => {
-                true
-            }
+            (Some(b), Some(l1), Some(l2), Some(t)) if t == l2 && l2 == l1 && l1 == b => true,
             (Some(b), Some(l1), Some(l2), None) if b == l2 && l2 == l1 => true,
             (Some(b), Some(l1), None, None) if b == l1 => true,
             (Some(_), None, None, None) => true,
@@ -155,34 +153,34 @@ impl WaterSorting {
         }
     }
 
-    pub fn pour(&mut self, from: u8, to: u8) {
+    pub fn pour(&mut self, from_index: u8, to_index: u8) {
         loop {
-            match self.bottles[from as usize].top_color() {
+            match self.bottles[from_index as usize].top_color() {
                 None => break,
                 Some(b) => {
-                    let to_b = &mut self.bottles[to as usize];
+                    let to_b = &mut self.bottles[to_index as usize];
                     let r = to_b.pour(b);
                     if !r {
                         break;
                     }
-                    self.bottles[from as usize].pop();
+                    self.bottles[from_index as usize].pop();
                 }
             }
         }
     }
 
     pub fn win(self) -> bool {
-        self.bottles.into_iter().all(|b| b.empty_or_one_color())
+        self.bottles.into_iter().all(|b| b.is_empty_or_one_color())
     }
 
     pub fn init_bottle(
         &mut self,
-        c: Option<Color>,
-        c1: Option<Color>,
-        c2: Option<Color>,
-        top: Option<Color>,
+        b: Option<Color>,
+        l1: Option<Color>,
+        l2: Option<Color>,
+        t: Option<Color>,
     ) {
-        self.bottles.push(Bottle::new(c, c1, c2, top));
+        self.bottles.push(Bottle::new(b, l1, l2, t));
     }
 
     pub fn init_empty_bottle(&mut self) {
@@ -270,19 +268,19 @@ mod tests {
     #[test]
     fn bottle_is_sorted_if_only_one_color_on_one_level() {
         let b = Bottle::with_one_color(Color::Blue);
-        assert!(b.empty_or_one_color())
+        assert!(b.is_empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_sorted_if_only_one_color_is_one_two_levels() {
         let b = Bottle::new(Some(Color::Blue), Some(Color::Blue), None, None);
-        assert!(b.empty_or_one_color())
+        assert!(b.is_empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_bottom_levels() {
         let b = Bottle::new(Some(Color::Blue), Some(Color::Orange), None, None);
-        assert!(!b.empty_or_one_color())
+        assert!(!b.is_empty_or_one_color())
     }
 
     #[test]
@@ -293,7 +291,7 @@ mod tests {
             Some(Color::Blue),
             None,
         );
-        assert!(!b.empty_or_one_color())
+        assert!(!b.is_empty_or_one_color())
     }
 
     #[test]
@@ -304,7 +302,7 @@ mod tests {
             Some(Color::Orange),
             Some(Color::Blue),
         );
-        assert!(!b.empty_or_one_color())
+        assert!(!b.is_empty_or_one_color())
     }
 
     #[test]
