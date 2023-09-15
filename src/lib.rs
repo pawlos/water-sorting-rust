@@ -73,6 +73,18 @@ impl Bottle {
         Bottle { bottom: Some(c), l1: None, l2: None, top: None }
     }
 
+    pub fn with_two_colors(b: Color, l1: Color) -> Self {
+        Bottle { bottom: Some(b), l1: Some(l1), l2: None, top: None}
+    }
+
+    pub fn with_three_colors(b: Color, l1: Color, l2: Color) -> Self {
+        Bottle { bottom: Some(b), l1: Some(l1), l2: Some(l2), top: None}
+    }
+
+    pub fn with_four_colors(b: Color, l1: Color, l2: Color, t: Color) -> Self {
+        Bottle { bottom: Some(b), l1: Some(l1), l2: Some(l2), top: Some(t) }
+    }
+
     pub fn is_empty(&self) -> bool {
         matches!(
             (self.bottom, self.l1, self.l2, self.top),
@@ -173,22 +185,24 @@ impl WaterSorting {
         self.bottles.into_iter().all(|b| b.is_empty_or_one_color())
     }
 
-    pub fn init_bottle(
-        &mut self,
-        b: Option<Color>,
-        l1: Option<Color>,
-        l2: Option<Color>,
-        t: Option<Color>,
-    ) {
-        self.bottles.push(Bottle::new(b, l1, l2, t));
-    }
-
     pub fn init_empty_bottle(&mut self) {
         self.bottles.push(Bottle::empty())
     }
 
     pub fn init_bottle_with_one_color(&mut self, c: Color) {
         self.bottles.push(Bottle::with_one_color(c))
+    }
+
+    pub fn init_bottle_with_two_colors(&mut self, b: Color, l1: Color) {
+        self.bottles.push(Bottle::with_two_colors(b, l1))
+    }
+
+    pub fn init_bottle_with_three_colors(&mut self, b: Color, l1: Color, l2: Color) {
+        self.bottles.push(Bottle::with_three_colors(b, l1, l2))
+    }
+
+    pub fn init_bottle_with_four_colors(&mut self, b: Color, l1: Color, l2: Color, t: Color) {
+        self.bottles.push(Bottle::with_four_colors(b, l1, l2, t))
     }
 
     pub fn move_available(self) -> bool {
@@ -221,7 +235,7 @@ mod tests {
     fn pour_works_on_one_level() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
-        w.init_bottle(Some(Color::Orange), Some(Color::Blue), None, None);
+        w.init_bottle_with_two_colors(Color::Orange, Color::Blue);
 
         w.pour(1, 0);
 
@@ -234,7 +248,7 @@ mod tests {
     fn pour_works_on_multiple_levels() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
-        w.init_bottle(Some(Color::Blue), Some(Color::Blue), None, None);
+        w.init_bottle_with_two_colors(Color::Blue, Color::Blue);
 
         w.pour(1, 0);
 
@@ -249,12 +263,7 @@ mod tests {
     fn pour_works_on_multiple_levels_with_different_bottom_one() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
-        w.init_bottle(
-            Some(Color::Orange),
-            Some(Color::Blue),
-            Some(Color::Blue),
-            None,
-        );
+        w.init_bottle_with_three_colors(Color::Orange,Color::Blue,Color::Blue);
 
         w.pour(1, 0);
 
@@ -309,12 +318,7 @@ mod tests {
     fn game_is_won_if_all_bottles_are_sorted() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
-        w.init_bottle(
-            Some(Color::Orange),
-            Some(Color::Blue),
-            Some(Color::Blue),
-            None,
-        );
+        w.init_bottle_with_three_colors(Color::Orange,Color::Blue,Color::Blue);
 
         w.pour(1, 0);
 
@@ -332,18 +336,8 @@ mod tests {
     fn if_there_are_all_full_bottles_move_is_not_available() {
         let mut w = WaterSorting::new();
 
-        w.init_bottle(
-            Some(Color::Blue),
-            Some(Color::Blue),
-            Some(Color::Blue),
-            None,
-        );
-        w.init_bottle(
-            Some(Color::Green),
-            Some(Color::Green),
-            Some(Color::Green),
-            Some(Color::Green),
-        );
+        w.init_bottle_with_three_colors(Color::Blue, Color::Blue, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Green, Color::Green, Color::Green, Color::Green);
 
         assert!(!w.move_available())
     }
@@ -351,18 +345,8 @@ mod tests {
     #[test]
     fn solve_real_game() {
         let mut w = WaterSorting::new();
-        w.init_bottle(
-            Some(Color::Green),
-            Some(Color::Red),
-            Some(Color::Green),
-            Some(Color::Red),
-        );
-        w.init_bottle(
-            Some(Color::Red),
-            Some(Color::Green),
-            Some(Color::Red),
-            Some(Color::Green),
-        );
+        w.init_bottle_with_four_colors(Color::Green,Color::Red, Color::Green, Color::Red);
+        w.init_bottle_with_four_colors(Color::Red,Color::Green,Color::Red,Color::Green);
         w.init_empty_bottle();
 
         w.pour(1, 2);
@@ -379,8 +363,8 @@ mod tests {
     #[test]
     fn pour_as_much_as_possible() {
         let mut w = WaterSorting::new();
-        w.init_bottle(Some(Color::Green), Some(Color::Red), Some(Color::Red), None);
-        w.init_bottle(Some(Color::Green), Some(Color::Red), Some(Color::Red), None);
+        w.init_bottle_with_three_colors(Color::Green, Color::Red, Color::Red);
+        w.init_bottle_with_three_colors(Color::Green, Color::Red, Color::Red);
 
         w.pour(0, 1);
 
@@ -401,18 +385,8 @@ mod tests {
     #[ignore = "Not yet finished"]
     fn solve_automatically() {
         let mut w = WaterSorting::new();
-        w.init_bottle(
-            Some(Color::Green),
-            Some(Color::Red),
-            Some(Color::Green),
-            Some(Color::Red),
-        );
-        w.init_bottle(
-            Some(Color::Red),
-            Some(Color::Green),
-            Some(Color::Red),
-            Some(Color::Green),
-        );
+        w.init_bottle_with_four_colors(Color::Green,Color::Red, Color::Green, Color::Red);
+        w.init_bottle_with_four_colors(Color::Red,Color::Green, Color::Red,Color::Green);
         w.init_empty_bottle();
 
         w.solve();
