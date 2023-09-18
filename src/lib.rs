@@ -1,5 +1,9 @@
 use core::fmt::Debug;
+use std::fmt::{Display, Formatter};
+use wasm_bindgen::prelude::wasm_bindgen;
 
+#[wasm_bindgen]
+#[repr(u8)]
 #[derive(Copy, Clone, PartialEq)]
 pub enum Color {
     Empty,
@@ -29,6 +33,7 @@ impl Debug for Color {
     }
 }
 
+#[wasm_bindgen]
 #[derive(PartialEq)]
 struct Bottle {
     bottom: Option<Color>,
@@ -146,6 +151,7 @@ impl Bottle {
     }
 }
 
+#[wasm_bindgen]
 struct WaterSorting {
     bottles: Vec<Bottle>,
 }
@@ -158,6 +164,15 @@ impl Debug for WaterSorting {
     }
 }
 
+impl Display for WaterSorting {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("WaterSorting")
+            .field("bottles", &self.bottles)
+            .finish()
+    }
+}
+
+#[wasm_bindgen]
 impl WaterSorting {
     pub fn new() -> Self {
         WaterSorting {
@@ -222,6 +237,10 @@ impl WaterSorting {
     pub fn solve(&mut self) -> bool {
         for _b in self.bottles.as_slice() {}
         true
+    }
+
+    pub fn render(&self) -> String {
+        self.to_string()
     }
 }
 
