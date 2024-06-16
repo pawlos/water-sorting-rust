@@ -3,7 +3,6 @@ use std::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
-#[repr(u8)]
 #[derive(Copy, Clone, PartialEq)]
 pub enum Color {
     Empty,
@@ -18,7 +17,7 @@ pub enum Color {
 }
 
 impl Debug for Color {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Blue => write!(f, "🟦"),
             Self::Red => write!(f, "🟥"),
@@ -43,7 +42,7 @@ struct Bottle {
 }
 
 impl Debug for Bottle {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "{:#?}{:#?}{:#?}{:#?}",
@@ -52,6 +51,12 @@ impl Debug for Bottle {
             self.l2.unwrap_or(Color::Empty),
             self.top.unwrap_or(Color::Empty)
         )
+    }
+}
+
+impl Display for Bottle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}",self)
     }
 }
 
@@ -157,7 +162,7 @@ struct WaterSorting {
 }
 
 impl Debug for WaterSorting {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("WaterSorting")
             .field("bottles", &self.bottles)
             .finish()
@@ -166,9 +171,11 @@ impl Debug for WaterSorting {
 
 impl Display for WaterSorting {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WaterSorting")
-            .field("bottles", &self.bottles)
-            .finish()
+        self.bottles.iter().for_each(|x|{
+            f.write_fmt(format_args!("{:?}\n", x)).expect("");
+            ()
+        });
+        Ok(())
     }
 }
 
@@ -228,6 +235,10 @@ impl WaterSorting {
             return false;
         }
         true
+    }
+
+    pub fn bottles(&self) -> *const Bottle {
+        self.bottles.as_ptr()
     }
 
     pub fn bottle_index(self, b: &Bottle) -> Option<usize> {
