@@ -33,7 +33,7 @@ impl Debug for Color {
 }
 
 #[wasm_bindgen]
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 struct Bottle {
     bottom: Option<Color>,
     l1: Option<Color>,
@@ -102,6 +102,10 @@ impl Bottle {
         )
     }
 
+    pub fn is_full(&self) -> bool {
+        matches!((self.bottom, self.l1, self.l2, self.top), (Some(_), Some(_), Some(_), Some(_)))
+    }
+
     pub fn top_color(&self) -> Option<Color> {
         match (self.top, self.l2, self.l1, self.bottom) {
             (None, None, None, None) => None,
@@ -157,7 +161,7 @@ impl Bottle {
 }
 
 #[wasm_bindgen]
-struct WaterSorting {
+pub struct WaterSorting {
     bottles: Vec<Bottle>,
 }
 
@@ -171,8 +175,8 @@ impl Debug for WaterSorting {
 
 impl Display for WaterSorting {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.bottles.iter().for_each(|x|{
-            f.write_fmt(format_args!("{:?}\n", x)).expect("");
+        self.bottles.iter().enumerate().for_each(|(i, x)|{
+            f.write_fmt(format_args!("{:?}: {:?}\n", i+1, x)).expect("");
             ()
         });
         Ok(())
@@ -203,8 +207,8 @@ impl WaterSorting {
         }
     }
 
-    pub fn win(self) -> bool {
-        self.bottles.into_iter().all(|b| b.is_empty_or_one_color())
+    pub fn win(&self) -> bool {
+        self.bottles.iter().copied().into_iter().all(|b| b.is_empty_or_one_color() && (b.is_empty() || b.is_full()))
     }
 
     pub fn init_empty_bottle(&mut self) {
@@ -348,12 +352,24 @@ mod tests {
     fn game_is_won_if_all_bottles_are_sorted() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
-        w.init_bottle_with_three_colors(Color::Orange,Color::Blue,Color::Blue);
+        w.init_bottle_with_three_colors(Color::Blue,Color::Blue,Color::Blue);
 
-        w.pour(1, 0);
+        w.pour(0, 1);
 
         assert!(w.win())
     }
+
+    #[test]
+    fn game_is_won_if_all_bottles_are_sorted_in_full() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Red);
+        w.init_bottle_with_one_color(Color::Magenta);
+        w.init_bottle_with_three_colors(Color::Red, Color::Red, Color::Red);
+        w.init_bottle_with_three_colors(Color::Magenta, Color::Magenta, Color::Magenta);
+
+        assert!(!w.win())
+    }
+
     #[test]
     fn if_there_is_an_empty_bottle_move_is_available() {
         let mut w = WaterSorting::new();
