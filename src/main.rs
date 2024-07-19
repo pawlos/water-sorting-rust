@@ -19,7 +19,7 @@ pub fn main() {
             break;
         }
         println!();
-        println!("Provide source bottle: ");
+        println!("Provide next move (src -> desc): ");
         let mut line: String = Default::default();
         let result = io::stdin().read_line(&mut line);
 
@@ -27,14 +27,18 @@ pub fn main() {
             break;
         }
 
-        let source_no = line.trim().parse::<u8>().unwrap() - 1;
-        println!("Provide destination bottle: ");
-        let mut line: String = Default::default();
-        let result = io::stdin().read_line(&mut line);
-        if result.is_err() {
-            break;
+        let moves = line
+            .trim_end()
+            .split("->")
+            .filter_map(|x| x.parse::<u8>().ok())
+            .collect::<Vec<_>>();
+        if moves.iter().count() != 2 {
+            println!("Wrong move!");
+            continue;
         }
-        let destination_no = line.trim().parse::<u8>().unwrap() - 1;
+
+        let source_no = moves[0] - 1;
+        let destination_no = moves[1] - 1;
         println!("Pouring...");
         w.pour(source_no, destination_no);
     }
