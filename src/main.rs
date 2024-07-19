@@ -3,10 +3,15 @@ use water_sort::{Color, WaterSorting};
 
 pub fn main() {
     let mut w = WaterSorting::new();
-    w.init_bottle_with_one_color(Color::Red);
-    w.init_bottle_with_one_color(Color::Magenta);
-    w.init_bottle_with_three_colors(Color::Red, Color::Red, Color::Red);
-    w.init_bottle_with_three_colors(Color::Magenta, Color::Magenta, Color::Magenta);
+    w.init_bottle_with_four_colors(Color::Red, Color::Magenta, Color::Magenta, Color::Orange);
+    w.init_bottle_with_four_colors(Color::Yellow, Color::Brown, Color::Blue, Color::Green);
+    w.init_bottle_with_four_colors(Color::Brown, Color::Red, Color::Orange, Color::Red);
+    w.init_bottle_with_four_colors(Color::Brown, Color::Blue, Color::Blue, Color::Orange);
+    w.init_bottle_with_four_colors(Color::Green, Color::Green, Color::Orange, Color::Yellow);
+    w.init_bottle_with_four_colors(Color::Red, Color::Yellow, Color::Magenta, Color::Magenta);
+    w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+    w.init_empty_bottle();
+    w.init_empty_bottle();
     loop {
         println!("{}", w);
         if w.win() {
