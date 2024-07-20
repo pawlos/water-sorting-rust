@@ -235,10 +235,18 @@ impl WaterSorting {
         if self.bottles.iter().any(|b| b.is_empty()) {
             return true;
         }
-        if self.bottles.iter().all(|b| !b.is_empty()) {
-            return false;
+
+        let top_colors = self.bottles.iter().map(|b| (b.top_color().unwrap(), b.is_full())).enumerate().collect::<Vec<_>>();
+        for (src, t1) in top_colors.clone() {
+            let (src_color, src_is_full) = t1;
+            for (dst,t2) in top_colors.clone() {
+                let (dst_color, dst_is_full) = t2;
+                if src != dst && src_color == dst_color {
+                    return !src_is_full || !dst_is_full
+                }
+            }
         }
-        true
+        false
     }
 
     pub fn bottles(&self) -> *const Bottle {
@@ -386,6 +394,33 @@ mod tests {
         w.init_bottle_with_four_colors(Color::Green, Color::Green, Color::Green, Color::Green);
 
         assert!(!w.move_available())
+    }
+
+    #[test]
+    fn if_top_colors_do_not_match_if_there_is_room_move_is_not_available() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_two_colors(Color::Blue, Color::Magenta);
+        w.init_bottle_with_two_colors(Color::Magenta, Color::Blue);
+
+        assert!(!w.move_available())
+    }
+
+    #[test]
+    fn if_top_colors_do_not_match_if_there_is_no_room_move_is_not_available() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Blue, Color::Magenta, Color::Red, Color::Green);
+        w.init_bottle_with_four_colors(Color::Magenta, Color::Blue, Color::Red, Color::Green);
+
+        assert!(!w.move_available())
+    }
+
+    #[test]
+    fn if_top_colors_do_match_if_there_is_room_move_is_available() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_two_colors(Color::Blue, Color::Magenta);
+        w.init_bottle_with_two_colors(Color::Blue, Color::Magenta);
+
+        assert!(w.move_available())
     }
 
     #[test]
