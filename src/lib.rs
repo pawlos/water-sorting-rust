@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 use std::fmt::{Display, Formatter};
-use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 #[derive(Copy, Clone, PartialEq)]
@@ -249,8 +249,34 @@ impl WaterSorting {
         false
     }
 
-    pub fn bottles(&self) -> *const Bottle {
-        self.bottles.as_ptr()
+    fn map_color_to_u8(c: Option<Color>) -> u8 {
+        match c {
+            None => 0,
+            Some(s) => {
+                match s {
+                    Color::Empty => {0}
+                    Color::Blue => {1}
+                    Color::Red => {2}
+                    Color::Gray => {3}
+                    Color::Orange => {4}
+                    Color::Brown => {5}
+                    Color::Yellow => {6}
+                    Color::Green => {7}
+                    Color::Magenta => {8}
+                }
+            }
+        }
+    }
+
+    pub fn bottles(&self) -> *const u8 {
+
+        self.bottles
+            .iter()
+            .flat_map(|b|  [Self::map_color_to_u8(b.bottom),
+                            Self::map_color_to_u8(b.l1),
+                            Self::map_color_to_u8(b.l2),
+                            Self::map_color_to_u8(b.top)]).collect::<Vec<_>>()
+            .as_ptr()
     }
 
     pub fn bottle_index(self, b: &Bottle) -> Option<usize> {
@@ -260,6 +286,10 @@ impl WaterSorting {
     pub fn solve(&mut self) -> bool {
         for _b in self.bottles.as_slice() {}
         true
+    }
+
+    pub fn bottles_count(&self) -> usize {
+        self.bottles.iter().count()
     }
 
     pub fn render(&self) -> String {
