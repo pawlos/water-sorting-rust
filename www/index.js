@@ -3,6 +3,7 @@ import { memory } from "wasm-water-sort/water_sort_bg"
 
 const SIZE = 25;
 const SPACE = 5;
+const PADDING = 5;
 const EMPTY = '#00000000'
 const BLUE = '#000080';
 const RED = '#fb0606';
@@ -17,13 +18,15 @@ const waterSorting = WaterSorting.new();
 waterSorting.init_bottle_with_one_color(Color.Red);
 waterSorting.init_bottle_with_two_colors(Color.Blue, Color.Red);
 waterSorting.init_bottle_with_three_colors(Color.Yellow, Color.Yellow, Color.Yellow);
+waterSorting.init_empty_bottle();
 
 const canvas = document.getElementById('water-sorting-canvas');
 const ctx = canvas.getContext('2d');
 
 const bottles_count = waterSorting.bottles_count();
-canvas.width = (bottles_count + 1)*SIZE;
-canvas.height = 5*SIZE;
+canvas.width = PADDING+(bottles_count + 1)*SIZE;
+canvas.height = 5*SIZE+10;
+canvas.style.cursor = 'pointer';
 
 
 const drawGame = () => {
@@ -31,21 +34,32 @@ const drawGame = () => {
     requestAnimationFrame(drawGame);
 }
 
-function drawBottles(bottlesPtr) {
-const bottles = new Uint8Array(memory.buffer, bottlesPtr, bottles_count * 4);
+const drawBottles = (bottlesPtr) => {
+    const bottles = new Uint8Array(memory.buffer, bottlesPtr, bottles_count * 4);
     for (let i = 0; i < bottles_count; i++) {
+        drawBottle(i);
         for (let j = 0; j < 4; j++) {
             drawBox(i, 4 - j, bottles[i*4+j])
         }
     }
 }
 
-function drawBox(x, y, c) {
-    if (c == 0) return;
+const drawBottle = (x) => {
+    ctx.beginPath();
+    ctx.strokeStyle = '#000';
+    ctx.moveTo(PADDING + x * (SIZE + SPACE)-1, SIZE+1);
+    ctx.lineTo(PADDING + x * (SIZE + SPACE)-1, 5*SIZE+1);
+    ctx.lineTo(PADDING + x * (SIZE+SPACE)+SIZE+1, 5*SIZE+1);
+    ctx.lineTo(PADDING + x * (SIZE+SPACE)+SIZE+1, SIZE+1);
+    ctx.stroke();
+}
+
+const drawBox = (x, y, c) => {
+    if (c === 0) return;
     ctx.fillStyle = colors[c];
 
     ctx.fillRect(
-        x * (SIZE+SPACE),
+        PADDING + x * (SIZE+SPACE),
         y * SIZE,
         SIZE,
         SIZE
