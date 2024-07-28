@@ -317,6 +317,17 @@ mod tests {
     }
 
     #[test]
+    fn pour_works_on_empty_bottle() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Blue);
+        w.init_empty_bottle();
+
+        w.pour(1, 0);
+        assert!(w.bottles[1].bottom.is_none());
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
+    }
+
+    #[test]
     fn pour_works_on_multiple_levels() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
