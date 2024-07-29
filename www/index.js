@@ -62,6 +62,7 @@ const mouseMove = (ev) => {
 canvas.onmousemove = mouseMove;
 
 const mouseClick = (ev) => {
+    if (waterSorting.win()) return;
     let point = getMousePos(canvas, ev);
     let x = point.x;
     const within = (el) => el.x1 <= x && el.x2 >= x;
@@ -82,14 +83,16 @@ const drawGame = () => {
         drawWin();
     } else {
         drawBottles(waterSorting.bottles());
-        requestAnimationFrame(drawGame);
     }
+    requestAnimationFrame(drawGame);
 }
 
 const drawWin = () => {
     ctx.fillStyle = colors[4];
     ctx.font = "40px serif"
-    ctx.fillText("You win!", 50,50, 100);
+    const win = "You win!";
+    const measure = ctx.measureText(win);
+    ctx.fillText(win, (canvas.width - measure.width) / 2,canvas.height - 20, measure.width);
 }
 
 const drawBottles = (bottlesPtr) => {
