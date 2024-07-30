@@ -292,6 +292,10 @@ impl WaterSorting {
         self.bottles.iter().count()
     }
 
+    pub fn reset(&mut self) {
+        self.bottles.clear();
+    }
+
     pub fn render(&self) -> String {
         self.to_string()
     }
@@ -302,6 +306,16 @@ mod tests {
     use crate::Bottle;
     use crate::Color;
     use crate::WaterSorting;
+
+    #[test]
+    fn reset_removes_all_the_elements() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Blue);
+
+        w.reset();
+
+        assert_eq!(w.bottles.len(), 0);
+    }
 
     #[test]
     fn pour_works_on_one_level() {
