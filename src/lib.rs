@@ -163,6 +163,7 @@ impl Bottle {
 #[wasm_bindgen]
 pub struct WaterSorting {
     bottles: Vec<Bottle>,
+    old_state: Option<Vec<Bottle>>
 }
 
 impl Debug for WaterSorting {
@@ -188,10 +189,12 @@ impl WaterSorting {
     pub fn new() -> Self {
         WaterSorting {
             bottles: Vec::with_capacity(4),
+            old_state: Option::None
         }
     }
 
     pub fn pour(&mut self, from_index: u8, to_index: u8) {
+        self.old_state = Some(self.bottles.clone());
         loop {
             match self.bottles[from_index as usize].top_color() {
                 None => break,
@@ -204,6 +207,13 @@ impl WaterSorting {
                     self.bottles[from_index as usize].pop();
                 }
             }
+        }
+    }
+
+    pub fn undo(&mut self) {
+        match &self.old_state {
+            None => {}
+            Some(old) => self.bottles = old.clone()
         }
     }
 
@@ -328,6 +338,22 @@ mod tests {
         assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
         assert!(w.bottles[1].l1.is_none());
         assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
+    }
+
+    #[test]
+    fn undo_restore_previous_level() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Blue);
+        w.init_bottle_with_two_colors(Color::Orange, Color::Blue);
+
+        w.pour(1, 0);
+
+        w.undo();
+
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
+        assert!(w.bottles[0].l1.is_none());
+        assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
+        assert_eq!(w.bottles[1].l1, Some(Color::Blue));
     }
 
     #[test]
