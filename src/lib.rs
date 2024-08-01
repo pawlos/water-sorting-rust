@@ -189,7 +189,7 @@ impl WaterSorting {
     pub fn new() -> Self {
         WaterSorting {
             bottles: Vec::with_capacity(4),
-            old_state: Option::None
+            old_state: None
         }
     }
 
@@ -213,7 +213,10 @@ impl WaterSorting {
     pub fn undo(&mut self) {
         match &self.old_state {
             None => {}
-            Some(old) => self.bottles = old.clone()
+            Some(old) => {
+                self.bottles = old.clone();
+                self.old_state = None
+            }
         }
     }
 
@@ -341,22 +344,6 @@ mod tests {
     }
 
     #[test]
-    fn undo_restore_previous_level() {
-        let mut w = WaterSorting::new();
-        w.init_bottle_with_one_color(Color::Blue);
-        w.init_bottle_with_two_colors(Color::Orange, Color::Blue);
-
-        w.pour(1, 0);
-
-        w.undo();
-
-        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
-        assert!(w.bottles[0].l1.is_none());
-        assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
-        assert_eq!(w.bottles[1].l1, Some(Color::Blue));
-    }
-
-    #[test]
     fn pour_works_on_empty_bottle() {
         let mut w = WaterSorting::new();
         w.init_bottle_with_one_color(Color::Blue);
@@ -395,6 +382,40 @@ mod tests {
         assert_eq!(w.bottles[0].l2, Some(Color::Blue));
         assert!(w.bottles[1].l1.is_none());
         assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
+    }
+
+    #[test]
+    fn undo_restore_previous_level() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Blue);
+        w.init_bottle_with_two_colors(Color::Orange, Color::Blue);
+
+        w.pour(1, 0);
+
+        w.undo();
+
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
+        assert!(w.bottles[0].l1.is_none());
+        assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
+        assert_eq!(w.bottles[1].l1, Some(Color::Blue));
+    }
+
+    #[test]
+    fn undo_restore_only_the_last_state() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Blue);
+        w.init_bottle_with_two_colors(Color::Orange, Color::Blue);
+        w.init_empty_bottle();
+
+        w.pour(1, 0);
+        w.pour(1,2);
+
+        w.undo();
+
+        assert_eq!(w.bottles[0].bottom, Some(Color::Blue));
+        assert_eq!(w.bottles[0].l1, Some(Color::Blue));
+        assert_eq!(w.bottles[1].bottom, Some(Color::Orange));
+        assert!(w.bottles[2].bottom.is_none());
     }
 
     #[test]
