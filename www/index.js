@@ -27,6 +27,7 @@ waterSorting.init_empty_bottle();
 waterSorting.init_empty_bottle();
 
 const canvas = document.getElementById('water-sorting-canvas');
+const undo_btn = document.getElementById('undo-btn');
 const ctx = canvas.getContext('2d');
 
 const bottles_count = waterSorting.bottles_count();
@@ -60,6 +61,12 @@ const mouseMove = (ev) => {
         canvas.style.cursor = 'default';
 }
 canvas.onmousemove = mouseMove;
+
+const undo = () => {
+    waterSorting.undo();
+}
+
+undo_btn.onclick = undo;
 
 const mouseClick = (ev) => {
     if (waterSorting.win()) return;
