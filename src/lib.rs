@@ -292,10 +292,6 @@ impl WaterSorting {
             .as_ptr()
     }
 
-    pub fn bottle_index(self, b: &Bottle) -> Option<usize> {
-        self.bottles.iter().position(|pb| pb == b)
-    }
-
     pub fn solve(&mut self) -> bool {
         for _b in self.bottles.as_slice() {}
         true
