@@ -62,8 +62,9 @@ const mouseMove = (ev) => {
 }
 canvas.onmousemove = mouseMove;
 
+let undo_requested = false;
 const undo = () => {
-    waterSorting.undo();
+    undo_requested = true;
 }
 
 undo_btn.onclick = undo;
@@ -76,16 +77,29 @@ const mouseClick = (ev) => {
     let index = positions.findIndex(within);
     if (index === -1) return;
     selected[selected.length % 2] = index;
-
-    if (selected.length === 2) {
-        waterSorting.pour(selected[0], selected[1]);
-        selected.splice(0, 2);
-    }
 }
 canvas.onclick = mouseClick;
 
 const drawGame = () => {
+    function perform_undo() {
+        undo_requested = false;
+        waterSorting.undo();
+    }
+
+    function perform_pouring() {
+        waterSorting.pour(selected[0], selected[1]);
+        selected.splice(0, 2);
+    }
+
     clear();
+
+    if (undo_requested) {
+        perform_undo();
+    }
+
+    if (selected.length === 2) {
+        perform_pouring();
+    }
     if (waterSorting.win()) {
         drawWin();
     } else {
