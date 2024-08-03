@@ -96,8 +96,7 @@ const drawGame = () => {
     if (undo_requested) {
         perform_undo();
     }
-
-    if (selected.length === 2) {
+    else if (selected.length === 2) {
         perform_pouring();
     }
     if (waterSorting.win()) {

@@ -76,23 +76,23 @@ impl Bottle {
     }
 
     pub fn empty() -> Self {
-        Bottle { bottom: None, l1: None, l2: None, top: None }
+        Bottle::new(None, None, None, None)
     }
 
     pub fn with_one_color(c: Color) -> Self {
-        Bottle { bottom: Some(c), l1: None, l2: None, top: None }
+        Bottle::new(Some(c), None, None, None)
     }
 
     pub fn with_two_colors(b: Color, l1: Color) -> Self {
-        Bottle { bottom: Some(b), l1: Some(l1), l2: None, top: None}
+        Bottle::new(Some(b), Some(l1), None, None)
     }
 
     pub fn with_three_colors(b: Color, l1: Color, l2: Color) -> Self {
-        Bottle { bottom: Some(b), l1: Some(l1), l2: Some(l2), top: None}
+        Bottle::new(Some(b), Some(l1), Some(l2), None)
     }
 
     pub fn with_four_colors(b: Color, l1: Color, l2: Color, t: Color) -> Self {
-        Bottle { bottom: Some(b), l1: Some(l1), l2: Some(l2), top: Some(t) }
+        Bottle::new(Some(b), Some(l1), Some(l2), Some(t))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -194,7 +194,7 @@ impl WaterSorting {
     }
 
     pub fn pour(&mut self, from_index: u8, to_index: u8) {
-        self.old_state = Some(self.bottles.clone());
+        self.old_state = Some(self.bottles.to_vec());
         loop {
             match self.bottles[from_index as usize].top_color() {
                 None => break,
@@ -214,14 +214,14 @@ impl WaterSorting {
         match &self.old_state {
             None => {}
             Some(old) => {
-                self.bottles = old.clone();
+                self.bottles = old.to_vec();
                 self.old_state = None
             }
         }
     }
 
     pub fn win(&self) -> bool {
-        self.bottles.iter().copied().into_iter().all(|b| b.is_empty_or_one_color() && (b.is_empty() || b.is_full()))
+        self.bottles.iter().all(|b| b.is_empty_or_one_color() && (b.is_empty() || b.is_full()))
     }
 
     pub fn init_empty_bottle(&mut self) {
