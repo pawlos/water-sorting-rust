@@ -194,7 +194,7 @@ impl WaterSorting {
     }
 
     pub fn pour(&mut self, from_index: u8, to_index: u8) {
-        self.old_state = Some(self.bottles.to_vec());
+        //self.old_state = Some(self.bottles.to_vec());
         loop {
             match self.bottles[from_index as usize].top_color() {
                 None => break,
