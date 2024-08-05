@@ -76,7 +76,12 @@ const mouseClick = (ev) => {
     const within = (el) => el.x1 <= x && el.x2 >= x;
     let index = positions.findIndex(within);
     if (index === -1) return;
-    selected[selected.length % 2] = index;
+    if (index in selected)
+        selected.splice(0, 1);
+    else
+        selected[selected.length % 2] = index;
+
+
 }
 canvas.onclick = mouseClick;
 
