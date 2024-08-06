@@ -125,7 +125,7 @@ const drawBottles = (bottlesPtr) => {
     for (let i = 0; i < bottles_count; i++) {
         drawBottle(i);
         for (let j = 0; j < 4; j++) {
-            drawBox(i, 4 - j, bottles[i*4+j])
+            drawFluid(i, 4 - j, bottles[i*4+j])
         }
     }
 }
@@ -148,7 +148,7 @@ const drawBottle = (x) => {
     ctx.stroke();
 }
 
-const drawBox = (x, y, c) => {
+const drawFluid = (x, y, c) => {
     ctx.fillStyle = colors[c];
     let padding = 0;
     if (selected[0] === x)
