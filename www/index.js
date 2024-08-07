@@ -138,9 +138,7 @@ const clear = () => {
 const drawBottle = (x) => {
     ctx.beginPath();
     ctx.strokeStyle = '#000';
-    let padding = 0;
-    if (selected[0] === x)
-        padding = SELECTED_PADDING;
+    let padding = selected[0] === x ? SELECTED_PADDING: 0;
     ctx.moveTo(PADDING + x * (SIZE + SPACE)-1, SIZE+1+padding);
     ctx.lineTo(PADDING + x * (SIZE + SPACE)-1, 5*SIZE+1+padding);
     ctx.lineTo(PADDING + x * (SIZE+SPACE)+SIZE+1, 5*SIZE+1+padding);
@@ -150,9 +148,8 @@ const drawBottle = (x) => {
 
 const drawFluid = (x, y, c) => {
     ctx.fillStyle = colors[c];
-    let padding = 0;
-    if (selected[0] === x)
-        padding = SELECTED_PADDING;
+    let padding = selected[0] === x ? SELECTED_PADDING : 0;
+
     ctx.fillRect(
         PADDING + x * (SIZE+SPACE),
         y * SIZE + padding,
