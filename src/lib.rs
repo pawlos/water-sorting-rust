@@ -163,7 +163,8 @@ impl Bottle {
 #[wasm_bindgen]
 pub struct WaterSorting {
     bottles: Vec<Bottle>,
-    old_state: Option<Vec<Bottle>>
+    old_state: Option<Vec<Bottle>>,
+    bottles_serialized: Vec<u8>,
 }
 
 impl Debug for WaterSorting {
@@ -189,12 +190,13 @@ impl WaterSorting {
     pub fn new() -> Self {
         WaterSorting {
             bottles: Vec::with_capacity(4),
-            old_state: None
+            old_state: None,
+            bottles_serialized: Vec::with_capacity(16)
         }
     }
 
     pub fn pour(&mut self, from_index: u8, to_index: u8) {
-        //self.old_state = Some(self.bottles.to_vec());
+        self.old_state = Some(self.bottles.to_vec());
         loop {
             match self.bottles[from_index as usize].top_color() {
                 None => break,
@@ -281,15 +283,15 @@ impl WaterSorting {
         }
     }
 
-    pub fn bottles(&self) -> *const u8 {
+    pub fn bottles(&mut self) -> *const u8 {
 
-        self.bottles
+        self.bottles_serialized = self.bottles
             .iter()
             .flat_map(|b|  [Self::map_color_to_u8(b.bottom),
                             Self::map_color_to_u8(b.l1),
                             Self::map_color_to_u8(b.l2),
-                            Self::map_color_to_u8(b.top)]).collect::<Vec<_>>()
-            .as_ptr()
+                            Self::map_color_to_u8(b.top)]).collect::<Vec<_>>();
+        self.bottles_serialized.as_ptr()
     }
 
     pub fn solve(&mut self) -> bool {
