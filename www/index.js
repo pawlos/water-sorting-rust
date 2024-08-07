@@ -76,7 +76,7 @@ const mouseClick = (ev) => {
     const within = (el) => el.x1 <= x && el.x2 >= x;
     let index = positions.findIndex(within);
     if (index === -1) return;
-    if (index in selected)
+    if (selected.includes(index))
         selected.splice(0, 1);
     else
         selected[selected.length % 2] = index;
@@ -88,6 +88,7 @@ canvas.onclick = mouseClick;
 const drawGame = () => {
     function perform_undo() {
         undo_requested = false;
+        selected.splice(0, 2);
         waterSorting.undo();
     }
 
