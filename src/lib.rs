@@ -222,6 +222,10 @@ impl WaterSorting {
         }
     }
 
+    pub fn undo_available(&self) -> bool {
+        self.old_state.is_some()
+    }
+
     pub fn win(&self) -> bool {
         self.bottles.iter().all(|b| b.is_empty_or_one_color() && (b.is_empty() || b.is_full()))
     }

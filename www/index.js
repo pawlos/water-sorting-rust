@@ -97,6 +97,7 @@ const drawGame = () => {
         selected.splice(0, 2);
     }
 
+    waterSorting.undo_available() ? undo_btn.removeAttribute("disabled") : undo_btn.setAttribute("disabled", "disabled");
     clear();
 
     if (undo_requested) {
