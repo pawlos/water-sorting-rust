@@ -31,8 +31,8 @@ const undo_btn = document.getElementById('undo-btn');
 const ctx = canvas.getContext('2d');
 
 const bottles_count = waterSorting.bottles_count();
-canvas.width = PADDING+(bottles_count + 1)*(SIZE+SPACE)+10;
-canvas.height = 5*SIZE+10;
+canvas.width = PADDING+(bottles_count + 1)*(SIZE+SPACE)+SPACE;
+canvas.height = 5*SIZE+SPACE;
 
 const selected = [];
 
