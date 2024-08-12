@@ -16,18 +16,23 @@ const GREEN = '#008000'
 const MAGENTA = '#7f1894'
 const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA];
 const waterSorting = WaterSorting.new();
-waterSorting.init_bottle_with_four_colors(Color.Red, Color.Magenta, Color.Magenta, Color.Orange);
-waterSorting.init_bottle_with_four_colors(Color.Yellow, Color.Brown, Color.Blue, Color.Green);
-waterSorting.init_bottle_with_four_colors(Color.Brown, Color.Red, Color.Orange, Color.Red);
-waterSorting.init_bottle_with_four_colors(Color.Brown, Color.Blue, Color.Blue, Color.Orange);
-waterSorting.init_bottle_with_four_colors(Color.Green, Color.Green, Color.Orange, Color.Yellow);
-waterSorting.init_bottle_with_four_colors(Color.Red, Color.Yellow, Color.Magenta, Color.Magenta);
-waterSorting.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-waterSorting.init_empty_bottle();
-waterSorting.init_empty_bottle();
+
+const initialize = (ws) => {
+    ws.init_bottle_with_four_colors(Color.Red, Color.Magenta, Color.Magenta, Color.Orange);
+    ws.init_bottle_with_four_colors(Color.Yellow, Color.Brown, Color.Blue, Color.Green);
+    ws.init_bottle_with_four_colors(Color.Brown, Color.Red, Color.Orange, Color.Red);
+    ws.init_bottle_with_four_colors(Color.Brown, Color.Blue, Color.Blue, Color.Orange);
+    ws.init_bottle_with_four_colors(Color.Green, Color.Green, Color.Orange, Color.Yellow);
+    ws.init_bottle_with_four_colors(Color.Red, Color.Yellow, Color.Magenta, Color.Magenta);
+    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
+    ws.init_empty_bottle();
+    ws.init_empty_bottle();
+};
+initialize(waterSorting);
 
 const canvas = document.getElementById('water-sorting-canvas');
 const undo_btn = document.getElementById('undo-btn');
+const reset_btn = document.getElementById('reset-btn');
 const ctx = canvas.getContext('2d');
 
 const bottles_count = waterSorting.bottles_count();
@@ -66,8 +71,13 @@ let undo_requested = false;
 const undo = () => {
     undo_requested = true;
 }
-
 undo_btn.onclick = undo;
+
+let reset_requested = false;
+const reset = () => {
+    reset_requested = true;
+}
+reset_btn.onclick = reset;
 
 const mouseClick = (ev) => {
     if (waterSorting.win()) return;
@@ -96,9 +106,18 @@ const drawGame = () => {
         waterSorting.pour(selected[0], selected[1]);
         selected.splice(0, 2);
     }
+    function perform_reset() {
+        reset_requested = false;
+        waterSorting.reset();
+        initialize(waterSorting);
+    }
 
     waterSorting.undo_available() ? undo_btn.removeAttribute("disabled") : undo_btn.setAttribute("disabled", "disabled");
     clear();
+
+    if (reset_requested) {
+        perform_reset();
+    }
 
     if (undo_requested) {
         perform_undo();
