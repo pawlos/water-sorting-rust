@@ -16,6 +16,7 @@ const GREEN = '#008000'
 const MAGENTA = '#7f1894'
 const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA];
 const waterSorting = WaterSorting.new();
+const success = new Audio('success.mp3');
 
 const initialize = (ws) => {
     ws.init_bottle_with_four_colors(Color.Red, Color.Magenta, Color.Magenta, Color.Orange);
@@ -127,6 +128,7 @@ const drawGame = () => {
     }
     if (waterSorting.win()) {
         drawWin();
+	success.play();
     } else {
         drawBottles(waterSorting.bottles());
     }
