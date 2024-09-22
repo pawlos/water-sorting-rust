@@ -134,7 +134,7 @@ const drawGame = () => {
     }
     if (waterSorting.win()) {
         drawWin();
-	success.play();
+        success.play();
     } else {
         drawBottles(waterSorting.bottles());
     }
