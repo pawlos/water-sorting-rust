@@ -14,7 +14,8 @@ const BROWN = '#7b2525'
 const YELLOW = '#F0F000'
 const GREEN = '#008000'
 const MAGENTA = '#7f1894'
-const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA];
+const LIME = '#7aa402'
+const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, LIME];
 const waterSorting = WaterSorting.new();
 const success = new Audio('success.mp3');
 
@@ -25,6 +26,11 @@ const initialize = (ws) => {
     ws.init_bottle_with_four_colors(Color.Brown, Color.Blue, Color.Blue, Color.Orange);
     ws.init_bottle_with_four_colors(Color.Green, Color.Green, Color.Orange, Color.Yellow);
     ws.init_bottle_with_four_colors(Color.Red, Color.Yellow, Color.Magenta, Color.Magenta);
+    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
+    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
+    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
+    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
+    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
     ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
     ws.init_empty_bottle();
     ws.init_empty_bottle();
