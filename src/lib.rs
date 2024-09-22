@@ -35,10 +35,29 @@ impl Debug for Color {
 #[wasm_bindgen]
 #[derive(PartialEq, Copy, Clone)]
 struct Bottle {
+    index: Option<usize>,
     bottom: Option<Color>,
     l1: Option<Color>,
     l2: Option<Color>,
     top: Option<Color>,
+}
+
+#[wasm_bindgen]
+struct Move {
+    from: usize,
+    to: usize
+}
+
+impl Move {
+    pub fn new(from: usize, to: usize) -> Self {
+        Move {from, to }
+    }
+}
+
+impl PartialEq for Move {
+    fn eq(&self, other: &Self) -> bool {
+        self.from == other.from && self.to == other.to
+    }
 }
 
 impl Debug for Bottle {
@@ -62,12 +81,14 @@ impl Display for Bottle {
 
 impl Bottle {
     pub fn new(
+        index: Option<usize>,
         bottom: Option<Color>,
         l1: Option<Color>,
         l2: Option<Color>,
         top: Option<Color>,
     ) -> Self {
         Bottle {
+            index,
             bottom,
             l1,
             l2,
@@ -75,24 +96,24 @@ impl Bottle {
         }
     }
 
-    pub fn empty() -> Self {
-        Bottle::new(None, None, None, None)
+    pub fn empty(idx: usize) -> Self {
+        Bottle::new(Some(idx), None, None, None, None)
     }
 
-    pub fn with_one_color(c: Color) -> Self {
-        Bottle::new(Some(c), None, None, None)
+    pub fn with_one_color(idx: usize, c: Color) -> Self {
+        Bottle::new(Some(idx), Some(c), None, None, None)
     }
 
-    pub fn with_two_colors(b: Color, l1: Color) -> Self {
-        Bottle::new(Some(b), Some(l1), None, None)
+    pub fn with_two_colors(idx: usize, b: Color, l1: Color) -> Self {
+        Bottle::new(Some(idx), Some(b), Some(l1), None, None)
     }
 
-    pub fn with_three_colors(b: Color, l1: Color, l2: Color) -> Self {
-        Bottle::new(Some(b), Some(l1), Some(l2), None)
+    pub fn with_three_colors(idx: usize, b: Color, l1: Color, l2: Color) -> Self {
+        Bottle::new(Some(idx), Some(b), Some(l1), Some(l2), None)
     }
 
-    pub fn with_four_colors(b: Color, l1: Color, l2: Color, t: Color) -> Self {
-        Bottle::new(Some(b), Some(l1), Some(l2), Some(t))
+    pub fn with_four_colors(idx: usize, b: Color, l1: Color, l2: Color, t: Color) -> Self {
+        Bottle::new(Some(idx), Some(b), Some(l1), Some(l2), Some(t))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -231,23 +252,23 @@ impl WaterSorting {
     }
 
     pub fn init_empty_bottle(&mut self) {
-        self.bottles.push(Bottle::empty())
+        self.bottles.push(Bottle::empty(self.bottles.iter().count()))
     }
 
     pub fn init_bottle_with_one_color(&mut self, c: Color) {
-        self.bottles.push(Bottle::with_one_color(c))
+        self.bottles.push(Bottle::with_one_color(self.bottles.iter().count(), c))
     }
 
     pub fn init_bottle_with_two_colors(&mut self, b: Color, l1: Color) {
-        self.bottles.push(Bottle::with_two_colors(b, l1))
+        self.bottles.push(Bottle::with_two_colors(self.bottles.iter().count(), b, l1))
     }
 
     pub fn init_bottle_with_three_colors(&mut self, b: Color, l1: Color, l2: Color) {
-        self.bottles.push(Bottle::with_three_colors(b, l1, l2))
+        self.bottles.push(Bottle::with_three_colors(self.bottles.iter().count(), b, l1, l2))
     }
 
     pub fn init_bottle_with_four_colors(&mut self, b: Color, l1: Color, l2: Color, t: Color) {
-        self.bottles.push(Bottle::with_four_colors(b, l1, l2, t))
+        self.bottles.push(Bottle::with_four_colors(self.bottles.iter().count(), b, l1, l2, t))
     }
 
     pub fn move_available(self) -> bool {
@@ -255,7 +276,7 @@ impl WaterSorting {
             return true;
         }
 
-        let top_colors = self.bottles.iter().map(|b| (b.top_color().unwrap(), b.is_full())).enumerate().collect::<Vec<_>>();
+        let top_colors = self.top_colors();
         for (src, t1) in top_colors.clone() {
             let (src_color, src_is_full) = t1;
             for (dst,t2) in top_colors.clone() {
@@ -266,6 +287,30 @@ impl WaterSorting {
             }
         }
         false
+    }
+
+    fn next_available_move(self) -> Option<Move> {
+        let first_empty_bottle = self.bottles.iter().find(|b| b.is_empty());
+        let first_non_empty_bottle = self.bottles.iter().find(|b| !b.is_empty());
+        if first_empty_bottle.is_some() && first_non_empty_bottle.is_some() {
+            return Some(Move::new(first_non_empty_bottle?.index.unwrap(), first_empty_bottle?.index.unwrap()))
+        }
+
+        let top_colors = self.top_colors();
+        for (src, t1) in top_colors.clone() {
+            let (src_color, _) = t1;
+            for (dst,t2) in top_colors.clone() {
+                let (dst_color, _) = t2;
+                if src != dst && src_color == dst_color {
+                    return Some(Move::new(src, dst))
+                }
+            }
+        }
+        None
+    }
+
+    fn top_colors(&self) -> Vec<(usize, (Color, bool))> {
+        self.bottles.iter().map(|b| (b.top_color().unwrap(), b.is_full())).enumerate().collect::<Vec<(usize, (Color, bool))>>()
     }
 
     fn map_color_to_u8(c: Option<Color>) -> u8 {
@@ -299,7 +344,9 @@ impl WaterSorting {
     }
 
     pub fn solve(&mut self) -> bool {
-        for _b in self.bottles.as_slice() {}
+        for _b in self.bottles.as_slice() {
+
+        }
         true
     }
 
@@ -313,6 +360,55 @@ impl WaterSorting {
 
     pub fn render(&self) -> String {
         self.to_string()
+    }
+}
+
+#[cfg(test)]
+mod move_tests {
+    use crate::{Color, WaterSorting};
+    use crate::Move;
+
+    #[test]
+    fn if_no_move_available_next_move_returns_none() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Blue, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Blue, Color::Red);
+
+        let next_move = w.next_available_move();
+        assert!(next_move.is_none())
+    }
+
+    #[test]
+    fn if_first_is_full_bottle_and_second_one_is_empty_one_move_is_returned_as_from_0_to_1() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Blue, Color::Blue);
+        w.init_empty_bottle();
+
+        let next_move = w.next_available_move();
+        assert!(next_move.is_some());
+        assert!(next_move.unwrap() == Move::new(0usize, 1usize))
+    }
+
+    #[test]
+    fn if_first_is_empty_bottle_and_second_is_full_bottle_move_is_returned_as_from_1_to_0() {
+        let mut w = WaterSorting::new();
+        w.init_empty_bottle();
+        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Blue, Color::Blue);
+
+        let next_move = w.next_available_move();
+        assert!(next_move.is_some());
+        assert!(next_move.unwrap() == Move::new(1usize, 0usize))
+    }
+
+    #[test]
+    fn if_there_are_no_empty_bottles_but_there_is_room_to_pour_move_is_returned() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_one_color(Color::Blue);
+        w.init_bottle_with_one_color(Color::Red);
+        w.init_bottle_with_two_colors(Color::Red, Color::Blue);
+
+        let next_move = w.next_available_move();
+        assert!(next_move.unwrap() == Move::new(0usize, 2usize))
     }
 }
 
@@ -422,29 +518,29 @@ mod tests {
 
     #[test]
     fn bottle_is_sorted_if_only_one_color_on_one_level() {
-        let b = Bottle::with_one_color(Color::Blue);
+        let b = Bottle::with_one_color(0, Color::Blue);
         assert!(b.is_empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_sorted_if_only_one_color_is_one_two_levels() {
-        let b = Bottle::new(Some(Color::Blue), Some(Color::Blue), None, None);
+        let b = Bottle::with_two_colors(0, Color::Blue, Color::Blue);
         assert!(b.is_empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_bottom_levels() {
-        let b = Bottle::new(Some(Color::Blue), Some(Color::Orange), None, None);
+        let b = Bottle::with_two_colors(0, Color::Blue, Color::Orange);
         assert!(!b.is_empty_or_one_color())
     }
 
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_middle_levels() {
-        let b = Bottle::new(
-            Some(Color::Blue),
-            Some(Color::Orange),
-            Some(Color::Blue),
-            None,
+        let b = Bottle::with_three_colors(
+            0,
+            Color::Blue,
+            Color::Orange,
+            Color::Blue
         );
         assert!(!b.is_empty_or_one_color())
     }
@@ -452,6 +548,7 @@ mod tests {
     #[test]
     fn bottle_is_not_sorted_if_different_colors_on_two_top_levels() {
         let b = Bottle::new(
+            None,
             Some(Color::Blue),
             Some(Color::Blue),
             Some(Color::Orange),
