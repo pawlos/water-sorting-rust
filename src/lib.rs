@@ -43,7 +43,7 @@ struct Bottle {
 }
 
 #[wasm_bindgen]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct Pour {
     from: usize,
     to: usize
@@ -291,10 +291,29 @@ impl WaterSorting {
     }
 
     fn next_available_move(&self) -> Option<Pour> {
-        let first_empty_bottle = self.bottles.iter().find(|b| b.is_empty());
-        let first_non_empty_bottle = self.bottles.iter().find(|b| !b.is_empty());
-        if first_empty_bottle.is_some() && first_non_empty_bottle.is_some() {
-            return Some(Pour::new(first_non_empty_bottle?.index.unwrap(), first_empty_bottle?.index.unwrap()))
+        self.next_available_move_except(&Vec::new())
+    }
+
+    fn next_available_moves(&self) -> Vec<Pour> {
+        let mut moves = Vec::new();
+        while let Some(pour) = self.next_available_move_except(&moves) {
+            moves.push(pour);
+        }
+
+        moves
+    }
+
+    fn next_available_move_except(&self, moves: &Vec<Pour>) -> Option<Pour> {
+        let empty_bottles = self.bottles.iter().filter(|b| b.is_empty());
+
+        for empty in empty_bottles {
+            let non_empty_bottles = self.bottles.iter().filter(|b| !b.is_empty());
+            for non_empty in non_empty_bottles {
+                let pour = Pour::new(non_empty.index.unwrap(), empty.index.unwrap());
+                if !moves.contains(&pour) {
+                    return Some(pour);
+                }
+            }
         }
 
         let top_colors = self.top_colors();
@@ -302,8 +321,9 @@ impl WaterSorting {
             let (src_color, _) = t1;
             for (dst,t2) in top_colors.clone() {
                 let (dst_color, dst_is_full) = t2;
-                if src != dst && src_color == dst_color && !dst_is_full {
-                    return Some(Pour::new(src, dst))
+                let pour = Pour::new(src, dst);
+                if src != dst && src_color == dst_color && !dst_is_full && !moves.contains(&pour) {
+                    return Some(pour)
                 }
             }
         }
@@ -311,7 +331,12 @@ impl WaterSorting {
     }
 
     fn top_colors(&self) -> Vec<(usize, (Color, bool))> {
-        self.bottles.iter().map(|b| (b.top_color().unwrap(), b.is_full())).enumerate().collect::<Vec<(usize, (Color, bool))>>()
+        self.bottles
+            .iter()
+            .filter(|b| !b.is_empty())
+            .map(|b| (b.top_color().unwrap(), b.is_full()))
+            .enumerate()
+            .collect::<Vec<(usize, (Color, bool))>>()
     }
 
     fn map_color_to_u8(c: Option<Color>) -> u8 {
@@ -376,6 +401,38 @@ impl WaterSorting {
 
     pub fn render(&self) -> String {
         self.to_string()
+    }
+}
+
+#[cfg(test)]
+mod next_available_moves_tests {
+    use crate::{Color, Pour, WaterSorting};
+
+    #[test]
+    fn next_available_moves_returns_all_the_moves() {
+        let mut w = WaterSorting::new();
+
+        w.init_bottle_with_one_color(Color::Green);
+        w.init_bottle_with_one_color(Color::Green);
+
+        let moves = w.next_available_moves();
+
+        let available_moves = [Pour::new(0,1), Pour::new(1,0)].to_vec();
+        assert_eq!(moves, available_moves);
+    }
+
+    #[test]
+    fn next_available_moves_with_empty_bottle_returns_all_the_moves() {
+        let mut w = WaterSorting::new();
+
+        w.init_bottle_with_one_color(Color::Green);
+        w.init_bottle_with_one_color(Color::Green);
+        w.init_empty_bottle();
+
+        let moves = w.next_available_moves();
+
+        let available_moves = [Pour::new(0,2), Pour::new(1,2), Pour::new(0,1), Pour::new(1,0)].to_vec();
+        assert_eq!(moves, available_moves);
     }
 }
 
@@ -697,7 +754,7 @@ mod tests {
         w.init_bottle_with_four_colors(Color::Red,Color::Red, Color::Red,Color::Green);
         w.init_empty_bottle();
 
-        let moves = w.solve(Vec::new());
+        let _ = w.solve(Vec::new());
 
         assert!(w.win());
     }
