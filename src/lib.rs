@@ -459,7 +459,7 @@ mod auto_solve_tests {
 
         let next_move = w.next_available_move();
         assert!(next_move.is_some());
-        assert!(next_move.unwrap() == Pour::new(0usize, 1usize))
+        assert_eq!(next_move.unwrap(), Pour::new(0usize, 1usize))
     }
 
     #[test]
@@ -470,7 +470,7 @@ mod auto_solve_tests {
 
         let next_move = w.next_available_move();
         assert!(next_move.is_some());
-        assert!(next_move.unwrap() == Pour::new(1usize, 0usize))
+        assert_eq!(next_move.unwrap(), Pour::new(1usize, 0usize))
     }
 
     #[test]
@@ -481,7 +481,7 @@ mod auto_solve_tests {
         w.init_bottle_with_two_colors(Color::Red, Color::Blue);
 
         let next_move = w.next_available_move();
-        assert!(next_move.unwrap() == Pour::new(0usize, 2usize))
+        assert_eq!(next_move.unwrap(), Pour::new(0usize, 2usize))
     }
 
     #[test]
@@ -492,7 +492,7 @@ mod auto_solve_tests {
         w.init_bottle_with_one_color(Color::Red);
 
         let next_move = w.next_available_move();
-        assert!(next_move.unwrap() == Pour::new(1usize, 0usize))
+        assert_eq!(next_move.unwrap(), Pour::new(1usize, 0usize))
     }
 }
 
