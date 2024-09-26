@@ -183,6 +183,7 @@ impl Bottle {
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct WaterSorting {
     bottles: Vec<Bottle>,
     old_state: Option<Vec<Bottle>>,
@@ -369,28 +370,6 @@ impl WaterSorting {
         self.bottles_serialized.as_ptr()
     }
 
-    fn solve(&mut self, mut moves: Vec<Pour>) -> Option<Vec<Pour>> {
-        if self.win() {
-            return Some(moves)
-        }
-        for _b in self.bottles.as_slice() {
-            let next_available_move = self.next_available_move();
-            let result = match next_available_move {
-                None =>  None,
-                Some(m) => {
-                    moves.push(Pour::new(m.from, m.to));
-                    self.pour(m.from as u8, m.to as u8);
-                    return self.solve(moves)
-                }
-            };
-            match result {
-                None => {}
-                Some(m) => return m
-            }
-        }
-        None
-    }
-
     pub fn bottles_count(&self) -> usize {
         self.bottles.iter().count()
     }
@@ -401,6 +380,45 @@ impl WaterSorting {
 
     pub fn render(&self) -> String {
         self.to_string()
+    }
+}
+
+#[wasm_bindgen]
+struct WaterSolver {
+    level: WaterSorting,
+}
+
+impl WaterSolver {
+    pub fn new(w: &WaterSorting) -> WaterSolver {
+        WaterSolver{ level: w.clone() }
+    }
+
+    pub fn solve(&self) -> Vec<Pour> {
+        let moves = Vec::new();
+        let new_w = self.level.clone();
+        self.solve_internal(new_w, moves, 0).unwrap_or_else(|| Vec::new())
+    }
+
+    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, count: u8) -> Option<Vec<Pour>> {
+        if w.win() {
+            return Some(moves)
+        }
+        if count > 8 {
+            return None
+        }
+        let next_available_moves = w.next_available_moves();
+        for next_move in next_available_moves {
+            let mut new_moves = moves.clone();
+            let mut new_w = w.clone();
+            new_moves.push(Pour::new(next_move.from, next_move.to));
+            new_w.pour(next_move.from as u8, next_move.to as u8);
+            let result = self.solve_internal(new_w, new_moves, count+1);
+            match result {
+                None => {}
+                r => return r
+            }
+        }
+        None
     }
 }
 
@@ -438,7 +456,7 @@ mod next_available_moves_tests {
 
 #[cfg(test)]
 mod auto_solve_tests {
-    use crate::{Color, WaterSorting};
+    use crate::{Color, WaterSolver, WaterSorting};
     use crate::Pour;
 
     #[test]
@@ -494,11 +512,35 @@ mod auto_solve_tests {
         let next_move = w.next_available_move();
         assert_eq!(next_move.unwrap(), Pour::new(1usize, 0usize))
     }
+
+    #[test]
+    fn solves_with_loops_during_the_solution() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Yellow, Color::Magenta, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Magenta, Color::Magenta, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Brown, Color::Brown, Color::Yellow, Color::Magenta);
+        w.init_empty_bottle();
+        w.init_empty_bottle();
+
+        let ref_w = &w;
+
+        let solver = WaterSolver::new(ref_w);
+
+        let result = solver.solve();
+
+        assert!(!result.is_empty());
+
+        for p in result.iter() {
+            w.pour(p.from as u8, p.to as u8);
+        }
+
+        assert!(w.win());
+    }
 }
 
 #[cfg(test)]
-mod tests {
-    use crate::Bottle;
+mod water_sorting_tests {
+    use crate::{Bottle, WaterSolver};
     use crate::Color;
     use crate::WaterSorting;
 
@@ -754,8 +796,13 @@ mod tests {
         w.init_bottle_with_four_colors(Color::Red,Color::Red, Color::Red,Color::Green);
         w.init_empty_bottle();
 
-        let _ = w.solve(Vec::new());
+        let solver = WaterSolver::new(&w);
 
+        let moves = solver.solve();
+
+        for _move in moves.iter() {
+            w.pour(_move.from as u8, _move.to as u8)
+        }
         assert!(w.win());
     }
 }
