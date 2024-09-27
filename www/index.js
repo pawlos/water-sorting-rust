@@ -15,7 +15,8 @@ const YELLOW = '#F0F000'
 const GREEN = '#008000'
 const MAGENTA = '#7f1894'
 const LIME = '#7aa402'
-const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, LIME];
+const TEAL = '#55adb0'
+const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, LIME, TEAL];
 const waterSorting = WaterSorting.new();
 const success = new Audio('success.mp3');
 

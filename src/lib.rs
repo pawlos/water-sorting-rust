@@ -14,6 +14,7 @@ pub enum Color {
     Yellow,
     Green,
     Magenta,
+    Teal
 }
 
 impl Debug for Color {
@@ -27,6 +28,7 @@ impl Debug for Color {
             Self::Yellow => write!(f, "🟨"),
             Self::Green => write!(f, "🟩"),
             Self::Magenta => write!(f, "🟪"),
+            Self::Teal => write!(f, "⏹"),
             Self::Empty => write!(f, ""),
         }
     }
@@ -353,7 +355,8 @@ impl WaterSorting {
                     Color::Brown => {5}
                     Color::Yellow => {6}
                     Color::Green => {7}
-                    Color::Magenta => {8}
+                    Color::Magenta => {8},
+                    Color::Teal => {9},
                 }
             }
         }
