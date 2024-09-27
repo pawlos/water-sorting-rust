@@ -406,7 +406,7 @@ impl WaterSolver {
         if w.win() {
             return Some(moves)
         }
-        if count > 8 {
+        if count > 10 {
             return None
         }
         let next_available_moves = w.next_available_moves();
@@ -522,6 +522,30 @@ mod auto_solve_tests {
         w.init_bottle_with_four_colors(Color::Yellow, Color::Magenta, Color::Brown, Color::Yellow);
         w.init_bottle_with_four_colors(Color::Magenta, Color::Magenta, Color::Brown, Color::Yellow);
         w.init_bottle_with_four_colors(Color::Brown, Color::Brown, Color::Yellow, Color::Magenta);
+        w.init_empty_bottle();
+        w.init_empty_bottle();
+
+        let ref_w = &w;
+
+        let solver = WaterSolver::new(ref_w);
+
+        let result = solver.solve();
+
+        assert!(!result.is_empty());
+
+        for p in result.iter() {
+            w.pour(p.from as u8, p.to as u8);
+        }
+
+        assert!(w.win());
+    }
+
+    #[test]
+    fn solves_with_another_level() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Teal, Color::Orange);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Teal, Color::Orange);
+        w.init_bottle_with_four_colors(Color::Teal, Color::Orange, Color::Blue, Color::Teal);
         w.init_empty_bottle();
         w.init_empty_bottle();
 
