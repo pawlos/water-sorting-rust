@@ -182,6 +182,13 @@ impl Bottle {
             _ => false,
         }
     }
+
+    pub fn is_solved(&self) -> bool {
+        match (self.bottom, self.l1, self.l2, self.top) {
+            (Some(b), Some(l1), Some(l2), Some(t)) if t == l2 && l2 == l1 && l1 == b => true,
+            _ => false,
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -312,6 +319,10 @@ impl WaterSorting {
         for empty in empty_bottles {
             let non_empty_bottles = self.bottles.iter().filter(|b| !b.is_empty());
             for non_empty in non_empty_bottles {
+                // do not list as available moves pouring from solved one to an empty one
+                if non_empty.is_solved() {
+                    continue
+                }
                 let pour = Pour::new(non_empty.index.unwrap(), empty.index.unwrap());
                 if !moves.contains(&pour) {
                     return Some(pour);
@@ -406,7 +417,7 @@ impl WaterSolver {
         if w.win() {
             return Some(moves)
         }
-        if count > 10 {
+        if count > 30 {
             return None
         }
         let next_available_moves = w.next_available_moves();
@@ -473,9 +484,9 @@ mod auto_solve_tests {
     }
 
     #[test]
-    fn if_first_is_full_bottle_and_second_one_is_empty_one_move_is_returned_as_from_0_to_1() {
+    fn if_first_is_bottle_with_two_colors_and_second_one_is_empty_one_move_is_returned_as_from_0_to_1() {
         let mut w = WaterSorting::new();
-        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Blue, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Orange, Color::Orange);
         w.init_empty_bottle();
 
         let next_move = w.next_available_move();
@@ -484,10 +495,10 @@ mod auto_solve_tests {
     }
 
     #[test]
-    fn if_first_is_empty_bottle_and_second_is_full_bottle_move_is_returned_as_from_1_to_0() {
+    fn if_first_is_empty_bottle_and_second_is_bottle_with_two_colors_move_is_returned_as_from_1_to_0() {
         let mut w = WaterSorting::new();
         w.init_empty_bottle();
-        w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Blue, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Orange, Color::Orange, Color::Blue, Color::Blue);
 
         let next_move = w.next_available_move();
         assert!(next_move.is_some());
@@ -546,6 +557,39 @@ mod auto_solve_tests {
         w.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Teal, Color::Orange);
         w.init_bottle_with_four_colors(Color::Blue, Color::Blue, Color::Teal, Color::Orange);
         w.init_bottle_with_four_colors(Color::Teal, Color::Orange, Color::Blue, Color::Teal);
+        w.init_empty_bottle();
+        w.init_empty_bottle();
+
+        let ref_w = &w;
+
+        let solver = WaterSolver::new(ref_w);
+
+        let result = solver.solve();
+
+        assert!(!result.is_empty());
+
+        for p in result.iter() {
+            w.pour(p.from as u8, p.to as u8);
+        }
+
+        assert!(w.win());
+    }
+
+    #[test]
+    fn solves_with_14_bottles() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Red, Color::Magenta, Color::Magenta, Color::Orange);
+        w.init_bottle_with_four_colors(Color::Yellow, Color::Brown, Color::Blue, Color::Green);
+        w.init_bottle_with_four_colors(Color::Brown, Color::Red, Color::Orange, Color::Red);
+        w.init_bottle_with_four_colors(Color::Brown, Color::Blue, Color::Blue, Color::Orange);
+        w.init_bottle_with_four_colors(Color::Green, Color::Green, Color::Orange, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Red, Color::Yellow, Color::Magenta, Color::Magenta);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
         w.init_empty_bottle();
         w.init_empty_bottle();
 
