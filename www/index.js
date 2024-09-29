@@ -15,26 +15,30 @@ const YELLOW = '#F0F000'
 const GREEN = '#008000'
 const MAGENTA = '#7f1894'
 const LIME = '#7aa402'
-const TEAL = '#55adb0'
-const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, LIME, TEAL];
+const TEAL = '#55b08d'
+const PURPLE = '#ab64d4'
+const LIGHTBLUE ='#2688ab'
+const PEACH = '#cb9486'
+const OLIVE = '#194e24'
+const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, TEAL, PURPLE, LIGHTBLUE, PEACH, OLIVE];
 const waterSorting = WaterSorting.new();
 const success = new Audio('success.mp3');
 
-const initialize = (ws) => {
-    ws.init_bottle_with_four_colors(Color.Red, Color.Magenta, Color.Magenta, Color.Orange);
-    ws.init_bottle_with_four_colors(Color.Yellow, Color.Brown, Color.Blue, Color.Green);
-    ws.init_bottle_with_four_colors(Color.Brown, Color.Red, Color.Orange, Color.Red);
-    ws.init_bottle_with_four_colors(Color.Brown, Color.Blue, Color.Blue, Color.Orange);
-    ws.init_bottle_with_four_colors(Color.Green, Color.Green, Color.Orange, Color.Yellow);
-    ws.init_bottle_with_four_colors(Color.Red, Color.Yellow, Color.Magenta, Color.Magenta);
-    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-    ws.init_bottle_with_four_colors(Color.Blue, Color.Green, Color.Brown, Color.Yellow);
-    ws.init_empty_bottle();
-    ws.init_empty_bottle();
+const initialize = (w) => {
+    w.init_bottle_with_four_colors(Color.Purple, Color.Yellow, Color.Purple, Color.Blue);
+    w.init_bottle_with_four_colors(Color.Gray, Color.Red, Color.Magenta, Color.LightBlue);
+    w.init_bottle_with_four_colors(Color.Magenta, Color.Blue, Color.Peach, Color.Gray);
+    w.init_bottle_with_four_colors(Color.LightBlue, Color.Olive, Color.Blue, Color.Peach);
+    w.init_bottle_with_four_colors(Color.Yellow, Color.Orange, Color.Peach, Color.Green);
+    w.init_bottle_with_four_colors(Color.Yellow, Color.Orange, Color.Magenta, Color.Magenta);
+    w.init_bottle_with_four_colors(Color.Teal, Color.Orange, Color.Green, Color.Green);
+    w.init_bottle_with_four_colors(Color.Olive, Color.Purple, Color.Purple, Color.Gray);
+    w.init_bottle_with_four_colors(Color.Orange, Color.Red, Color.Blue, Color.LightBlue);
+    w.init_bottle_with_four_colors(Color.Red, Color.Olive, Color.LightBlue, Color.Teal);
+    w.init_bottle_with_four_colors(Color.Olive, Color.Gray, Color.Teal, Color.Orange);
+    w.init_bottle_with_four_colors(Color.Red, Color.Green, Color.Yellow, Color.Teal);
+    w.init_empty_bottle();
+    w.init_empty_bottle();
 };
 initialize(waterSorting);
 

@@ -14,7 +14,11 @@ pub enum Color {
     Yellow,
     Green,
     Magenta,
-    Teal
+    Teal,
+    Purple,
+    LightBlue,
+    Peach,
+    Olive,
 }
 
 impl Debug for Color {
@@ -29,6 +33,10 @@ impl Debug for Color {
             Self::Green => write!(f, "🟩"),
             Self::Magenta => write!(f, "🟪"),
             Self::Teal => write!(f, "⏹"),
+            Self::Purple => write!(f, "p"),
+            Self::LightBlue => write!(f, "L"),
+            Self::Peach => write!(f, "P"),
+            Self::Olive => write!(f, "O"),
             Self::Empty => write!(f, ""),
         }
     }
@@ -320,7 +328,7 @@ impl WaterSorting {
             let non_empty_bottles = self.bottles.iter().filter(|b| !b.is_empty());
             for non_empty in non_empty_bottles {
                 // do not list as available moves pouring from solved one to an empty one
-                if non_empty.is_solved() {
+                if non_empty.is_solved() || non_empty.is_empty_or_one_color() {
                     continue
                 }
                 let pour = Pour::new(non_empty.index.unwrap(), empty.index.unwrap());
@@ -368,6 +376,10 @@ impl WaterSorting {
                     Color::Green => {7}
                     Color::Magenta => {8},
                     Color::Teal => {9},
+                    Color::Purple => {10},
+                    Color::LightBlue => {11},
+                    Color::Peach => {12},
+                    Color::Olive => {13},
                 }
             }
         }
@@ -578,18 +590,20 @@ mod auto_solve_tests {
     #[test]
     fn solves_with_14_bottles() {
         let mut w = WaterSorting::new();
-        w.init_bottle_with_four_colors(Color::Red, Color::Magenta, Color::Magenta, Color::Orange);
-        w.init_bottle_with_four_colors(Color::Yellow, Color::Brown, Color::Blue, Color::Green);
-        w.init_bottle_with_four_colors(Color::Brown, Color::Red, Color::Orange, Color::Red);
-        w.init_bottle_with_four_colors(Color::Brown, Color::Blue, Color::Blue, Color::Orange);
-        w.init_bottle_with_four_colors(Color::Green, Color::Green, Color::Orange, Color::Yellow);
-        w.init_bottle_with_four_colors(Color::Red, Color::Yellow, Color::Magenta, Color::Magenta);
-        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
-        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
-        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
-        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
-        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
-        w.init_bottle_with_four_colors(Color::Blue, Color::Green, Color::Brown, Color::Yellow);
+        w.init_bottle_with_four_colors(Color::Purple, Color::Yellow, Color::Purple, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Gray, Color::Red, Color::Magenta, Color::LightBlue);
+        w.init_bottle_with_four_colors(Color::Magenta, Color::Blue, Color::Peach, Color::Gray);
+        w.init_bottle_with_four_colors(Color::LightBlue, Color::Olive, Color::Blue, Color::Peach);
+        w.init_bottle_with_four_colors(Color::Yellow, Color::Orange, Color::Peach, Color::Green);
+        w.init_bottle_with_four_colors(Color::Yellow, Color::Orange, Color::Magenta, Color::Magenta);
+        w.init_bottle_with_four_colors(Color::Teal, Color::Orange, Color::Green, Color::Green);
+        w.init_bottle_with_four_colors(Color::Olive, Color::Purple, Color::Purple, Color::Gray);
+        w.init_bottle_with_four_colors(Color::Orange, Color::Red, Color::Blue, Color::LightBlue);
+        w.init_bottle_with_four_colors(Color::Red, Color::Olive, Color::LightBlue, Color::Teal);
+        w.init_bottle_with_four_colors(Color::Olive, Color::Gray, Color::Teal, Color::Orange);
+        w.init_bottle_with_four_colors(Color::Red, Color::Green, Color::Yellow, Color::Teal);
+
+
         w.init_empty_bottle();
         w.init_empty_bottle();
 
