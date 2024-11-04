@@ -328,7 +328,7 @@ impl WaterSorting {
             let non_empty_bottles = self.bottles.iter().filter(|b| !b.is_empty());
             for non_empty in non_empty_bottles {
                 // do not list as available moves pouring from solved one to an empty one
-                if non_empty.is_solved() || non_empty.is_empty_or_one_color() {
+                if non_empty.is_solved() {
                     continue
                 }
                 let pour = Pour::new(non_empty.index.unwrap(), empty.index.unwrap());
