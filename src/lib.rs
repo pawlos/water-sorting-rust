@@ -422,10 +422,11 @@ impl WaterSolver {
     pub fn solve(&self) -> Vec<Pour> {
         let moves = Vec::new();
         let new_w = self.level.clone();
-        self.solve_internal(new_w, moves, 0).unwrap_or_else(|| Vec::new())
+        let old_states = Vec::new();
+        self.solve_internal(new_w, moves, old_states, 0).unwrap_or_else(|| Vec::new())
     }
 
-    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, count: u8) -> Option<Vec<Pour>> {
+    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<Vec<Bottle>>, count: u8) -> Option<Vec<Pour>> {
         if w.win() {
             return Some(moves)
         }
@@ -436,9 +437,15 @@ impl WaterSolver {
         for next_move in next_available_moves {
             let mut new_moves = moves.clone();
             let mut new_w = w.clone();
+            let mut new_states = old_states.clone();
             new_moves.push(Pour::new(next_move.from, next_move.to));
             new_w.pour(next_move.from as u8, next_move.to as u8);
-            let result = self.solve_internal(new_w, new_moves, count+1);
+            if new_states.contains(&new_w.bottles.clone())
+            {
+                return None;
+            }
+            new_states.push(new_w.bottles.clone());
+            let result = self.solve_internal(new_w, new_moves, new_states, count+1);
             match result {
                 None => {}
                 r => return r
