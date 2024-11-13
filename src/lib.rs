@@ -621,6 +621,41 @@ mod auto_solve_tests {
 
         assert!(w.win());
     }
+
+    #[test]
+    fn solves_with_14_bottles_level231() {
+        let mut w = WaterSorting::new();
+        w.init_bottle_with_four_colors(Color::Orange, Color::Gray, Color::Brown, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Teal, Color::Yellow, Color::Yellow, Color::Teal);
+        w.init_bottle_with_four_colors(Color::Olive, Color::Brown, Color::Red, Color::Green);
+        w.init_bottle_with_four_colors(Color::Red, Color::Blue, Color::Orange, Color::Peach);
+        w.init_bottle_with_four_colors(Color::Brown, Color::Peach, Color::Green, Color::Magenta);
+        w.init_bottle_with_four_colors(Color::LightBlue, Color::LightBlue, Color::Gray, Color::Green);
+        w.init_bottle_with_four_colors(Color::Red, Color::Brown, Color::Magenta, Color::Blue);
+        w.init_bottle_with_four_colors(Color::Olive, Color::Yellow, Color::Teal, Color::Peach);
+        w.init_bottle_with_four_colors(Color::Green, Color::LightBlue, Color::Blue, Color::Orange);
+        w.init_bottle_with_four_colors(Color::Magenta, Color::Olive, Color::Orange, Color::Red);
+        w.init_bottle_with_four_colors(Color::Yellow, Color::Gray, Color::Teal, Color::Magenta);
+        w.init_bottle_with_four_colors(Color::LightBlue, Color::Peach, Color::Gray, Color::Olive);
+
+
+        w.init_empty_bottle();
+        w.init_empty_bottle();
+
+        let ref_w = &w;
+
+        let solver = WaterSolver::new(ref_w);
+
+        let result = solver.solve();
+
+        assert!(!result.is_empty());
+
+        for p in result.iter() {
+            w.pour(p.from as u8, p.to as u8);
+        }
+
+        assert!(w.win());
+    }
 }
 
 #[cfg(test)]
