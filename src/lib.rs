@@ -2,6 +2,8 @@ use core::fmt::Debug;
 use std::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::*;
 
+const MAX_RECURSION: usize = 30;
+
 #[wasm_bindgen]
 #[derive(Copy, Clone, PartialEq)]
 pub enum Color {
@@ -426,11 +428,11 @@ impl WaterSolver {
         self.solve_internal(new_w, moves, old_states, 0).unwrap_or_else(|| Vec::new())
     }
 
-    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<Vec<Bottle>>, count: u8) -> Option<Vec<Pour>> {
+    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<Vec<Bottle>>, count: usize) -> Option<Vec<Pour>> {
         if w.win() {
             return Some(moves)
         }
-        if count > 30 {
+        if count > MAX_RECURSION {
             return None
         }
         let next_available_moves = w.next_available_moves();
