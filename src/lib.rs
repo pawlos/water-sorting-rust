@@ -227,6 +227,18 @@ impl Display for WaterSorting {
     }
 }
 
+impl PartialEq<Self> for WaterSorting {
+    fn eq(&self, other: &Self) -> bool {
+        if self.bottles.len() != other.bottles.len() { false }
+        else {
+            for i in 0..self.bottles.len() {
+                if !self.bottles[i].eq(&other.bottles[i]) { return false; }
+            }
+            true
+        }
+    }
+}
+
 #[wasm_bindgen]
 impl WaterSorting {
     pub fn new() -> Self {
@@ -454,6 +466,70 @@ impl WaterSolver {
             }
         }
         None
+    }
+}
+
+#[cfg(test)]
+mod equals {
+    use crate::{Color, WaterSorting};
+
+    #[test]
+    fn if_one_with_2_and_other_with_1_number_of_bottles_eq_returns_false() {
+        let mut w1 = WaterSorting::new();
+        w1.init_empty_bottle();
+        w1.init_empty_bottle();
+        let mut w2 = WaterSorting::new();
+        w2.init_empty_bottle();
+
+        assert_ne!(w1, w2);
+    }
+
+    #[test]
+    fn if_one_with_2_and_other_with_3_number_of_bottles_eq_returns_false() {
+        let mut w1 = WaterSorting::new();
+        w1.init_empty_bottle();
+        w1.init_empty_bottle();
+        let mut w2 = WaterSorting::new();
+        w2.init_empty_bottle();
+        w2.init_empty_bottle();
+        w2.init_empty_bottle();
+
+        assert_ne!(w1, w2);
+    }
+
+    #[test]
+    fn if_one_with_3_and_other_with_4_number_of_bottles_eq_returns_false() {
+        let mut w1 = WaterSorting::new();
+        w1.init_empty_bottle();
+        w1.init_empty_bottle();
+        w1.init_empty_bottle();
+        let mut w2 = WaterSorting::new();
+        w2.init_empty_bottle();
+        w2.init_empty_bottle();
+        w2.init_empty_bottle();
+        w2.init_empty_bottle();
+
+        assert_ne!(w1, w2);
+    }
+
+    #[test]
+    fn if_the_same_number_of_bottles_but_different_setup_eq_returns_false() {
+        let mut w1 = WaterSorting::new();
+        w1.init_bottle_with_one_color(Color::Orange);
+        let mut w2 = WaterSorting::new();
+        w2.init_bottle_with_two_colors(Color::Orange, Color::Orange);
+
+        assert_ne!(w1, w2);
+    }
+
+    #[test]
+    fn if_the_same_number_of_bottles_but_different_setup_with_one_being_empty_eq_returns_false() {
+        let mut w1 = WaterSorting::new();
+        w1.init_empty_bottle();
+        let mut w2 = WaterSorting::new();
+        w2.init_bottle_with_two_colors(Color::Orange, Color::Orange);
+
+        assert_ne!(w1, w2);
     }
 }
 
