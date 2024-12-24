@@ -310,10 +310,10 @@ impl WaterSorting {
         }
 
         let top_colors = self.top_colors();
-        for (src, t1) in top_colors.clone() {
-            let (src_color, src_is_full) = t1;
-            for (dst,t2) in top_colors.clone() {
-                let (dst_color, dst_is_full) = t2;
+        for (src, top_src) in top_colors.clone() {
+            let (src_color, src_is_full) = top_src;
+            for (dst,top_dst) in top_colors.clone() {
+                let (dst_color, dst_is_full) = top_dst;
                 if src != dst && src_color == dst_color {
                     return !src_is_full || !dst_is_full
                 }
@@ -440,7 +440,7 @@ impl WaterSolver {
         self.solve_internal(new_w, moves, old_states, 0).unwrap_or_else(|| Vec::new())
     }
 
-    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<Vec<Bottle>>, count: usize) -> Option<Vec<Pour>> {
+    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<WaterSorting>, count: usize) -> Option<Vec<Pour>> {
         if w.win() {
             return Some(moves)
         }
@@ -454,11 +454,11 @@ impl WaterSolver {
             let mut new_states = old_states.clone();
             new_moves.push(Pour::new(next_move.from, next_move.to));
             new_w.pour(next_move.from as u8, next_move.to as u8);
-            if new_states.contains(&new_w.bottles.clone())
+            if new_states.iter().any(|f| f.eq(&new_w.clone()))
             {
                 return None;
             }
-            new_states.push(new_w.bottles.clone());
+            new_states.push(new_w.clone());
             let result = self.solve_internal(new_w, new_moves, new_states, count+1);
             match result {
                 None => {}
