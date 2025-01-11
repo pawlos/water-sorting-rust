@@ -1,11 +1,13 @@
 use core::fmt::Debug;
+use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::*;
+use std::ops::Add;
 
 const MAX_RECURSION: usize = 30;
 
 #[wasm_bindgen]
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Color {
     Empty,
     Blue,
@@ -421,6 +423,22 @@ impl WaterSorting {
     pub fn render(&self) -> String {
         self.to_string()
     }
+
+    pub fn can_be_sorted(&self) -> bool {
+        let mut hash_map: HashMap<Color, u8>  = HashMap::new();
+        for bottle in &self.bottles {
+            for l in [bottle.bottom, bottle.l1, bottle.l2, bottle.top] {
+                match l {
+                    None => continue,
+                    Some(c) => {
+                        let entry = hash_map.entry(c).or_default();
+                        *entry = entry.add(1u8);
+                    }
+                }
+            }
+        }
+        hash_map.iter().filter(|e| *e.1 != 4).count() == 0
+    }
 }
 
 #[wasm_bindgen]
@@ -436,7 +454,8 @@ impl WaterSolver {
     pub fn solve(&self) -> Vec<Pour> {
         let moves = Vec::new();
         let new_w = self.level.clone();
-        let old_states = Vec::new();
+        let mut old_states = Vec::new();
+        old_states.push(new_w.clone());
         self.solve_internal(new_w, moves, old_states, 0).unwrap_or_else(|| Vec::new())
     }
 
@@ -466,6 +485,53 @@ impl WaterSolver {
             }
         }
         None
+    }
+}
+
+#[cfg(test)]
+mod can_be_sorted {
+    use crate::{Color, WaterSorting};
+
+    #[test]
+    fn if_number_of_elements_for_each_color_is_not_equal_to_4_returns_false_two_colors(){
+        let mut w1 = WaterSorting::new();
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Orange, Color::Orange);
+        w1.init_bottle_with_three_colors(Color::Orange, Color::Blue, Color::Blue);
+
+        assert!(!w1.can_be_sorted())
+    }
+
+    #[test]
+    fn if_number_of_elements_for_each_color_is_not_equal_to_4_returns_false_three_colors(){
+        let mut w1 = WaterSorting::new();
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Orange, Color::Orange);
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Blue, Color::Teal);
+        w1.init_bottle_with_three_colors(Color::Blue, Color::Teal, Color::Teal);
+
+        assert!(!w1.can_be_sorted())
+    }
+
+    #[test]
+    fn if_number_of_elements_for_each_color_is_not_equal_to_4_returns_false_four_colors(){
+        let mut w1 = WaterSorting::new();
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Orange, Color::Orange);
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Blue, Color::Teal);
+        w1.init_bottle_with_four_colors(Color::Teal, Color::Teal, Color::Green, Color::Green);
+        w1.init_bottle_with_two_colors(Color::Teal, Color::Blue);
+
+        assert!(!w1.can_be_sorted())
+    }
+
+    #[test]
+    fn if_number_of_elements_for_each_color_is_equal_to_4_returns_true_four_colors(){
+        let mut w1 = WaterSorting::new();
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Orange, Color::Orange);
+        w1.init_bottle_with_four_colors(Color::Orange, Color::Blue, Color::Blue, Color::Teal);
+        w1.init_bottle_with_four_colors(Color::Teal, Color::Teal, Color::Green, Color::Green);
+        w1.init_bottle_with_three_colors(Color::Teal, Color::Blue, Color::Green);
+        w1.init_bottle_with_one_color(Color::Green);
+
+        assert!(w1.can_be_sorted())
     }
 }
 
@@ -726,6 +792,8 @@ mod auto_solve_tests {
 
         w.init_empty_bottle();
         w.init_empty_bottle();
+
+        assert!(w.can_be_sorted());
 
         let ref_w = &w;
 
