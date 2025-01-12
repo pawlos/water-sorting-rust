@@ -201,6 +201,17 @@ impl Bottle {
             _ => false,
         }
     }
+
+    pub fn available_empty_space(&self) -> usize {
+        match (self.bottom, self.l1, self.l2, self.top) {
+            (None, None, None, None) => 4,
+            (Some(_), None, None, None) => 3,
+            (Some(_), Some(_), None, None) => 2,
+            (Some(_), Some(_), Some(_), None) => 1,
+            (Some(_), Some(_), Some(_), Some(_)) => 0,
+            _ => panic!("Should not happen"),
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -532,6 +543,41 @@ mod can_be_sorted {
         w1.init_bottle_with_one_color(Color::Green);
 
         assert!(w1.can_be_sorted())
+    }
+}
+
+#[cfg(test)]
+mod available_empty_space {
+    use crate::{Bottle, Color};
+
+    #[test]
+    fn empty_bottle_has_four_available_spaces() {
+        let b = Bottle::empty(0);
+        assert_eq!(4, b.available_empty_space())
+    }
+
+    #[test]
+    fn bottle_with_one_color_has_three_available_spaces() {
+        let b = Bottle::with_one_color(0, Color::Green);
+        assert_eq!(3, b.available_empty_space())
+    }
+
+    #[test]
+    fn bottle_with_two_colors_has_two_available_spaces() {
+        let b = Bottle::with_two_colors(0, Color::Orange, Color::Orange);
+        assert_eq!(2, b.available_empty_space())
+    }
+
+    #[test]
+    fn bottle_with_three_colors_has_two_available_spaces() {
+        let b = Bottle::with_three_colors(0, Color::Green, Color::Green, Color::Green);
+        assert_eq!(1, b.available_empty_space())
+    }
+
+    #[test]
+    fn bottle_with_four_colors_has_no_available_spaces() {
+        let b = Bottle::with_four_colors(0, Color::Green, Color::Green, Color::Green, Color::Green);
+        assert_eq!(0, b.available_empty_space())
     }
 }
 
