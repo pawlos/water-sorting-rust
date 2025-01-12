@@ -212,6 +212,23 @@ impl Bottle {
             _ => panic!("Should not happen"),
         }
     }
+
+    pub fn amount_to_pour(&self) -> usize {
+        match (self.bottom, self.l1, self.l2, self.top) {
+            (None, None, None, None) => 0,
+            (Some(_), None, None, None) => 1,
+            (Some(b), Some(l1), None, None) if b == l1 => 2,
+            (Some(b), Some(l1), None, None) if b != l1 => 1,
+            (Some(b), Some(l1), Some(l2), None) if b == l1 && l1 == l2 => 3,
+            (Some(b), Some(l1), Some(l2), None) if l2 == l1 && l1 != b => 2,
+            (Some(_), Some(l1), Some(l2), None) if l2 != l1 => 1,
+            (Some(b), Some(l1), Some(l2), Some(t)) if t == l2 && l2 == l1 && l1 == b => 4,
+            (Some(_), Some(l1), Some(l2), Some(t)) if t == l2 && l2 == l1 => 3,
+            (Some(_), Some(_), Some(l2), Some(t)) if t == l2 => 2,
+            (Some(_), Some(_), Some(l2), Some(t)) if t != l2 => 1,
+            _ => panic!("Should not happen"),
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -543,6 +560,77 @@ mod can_be_sorted {
         w1.init_bottle_with_one_color(Color::Green);
 
         assert!(w1.can_be_sorted())
+    }
+}
+
+#[cfg(test)]
+mod amount_to_pour {
+    use crate::{Bottle, Color};
+
+    #[test]
+    fn empty_bottle_has_zero_amount_to_pour() {
+        let b = Bottle::empty(0);
+        assert_eq!(0, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_just_one_entry_has_one_amount_to_pour() {
+        let b = Bottle::with_one_color(0, Color::Orange);
+        assert_eq!(1, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_two_entries_that_are_different_has_one_amount_to_pour() {
+        let b = Bottle::with_two_colors(0, Color::Orange, Color::Green);
+        assert_eq!(1, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_two_entries_that_are_same_has_two_amount_to_pour() {
+        let b = Bottle::with_two_colors(0, Color::Orange, Color::Orange);
+        assert_eq!(2, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_three_entries_that_two_top_are_different_has_one_amount_to_pour() {
+        let b = Bottle::with_three_colors(0, Color::Orange, Color::Orange, Color::Green);
+        assert_eq!(1, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_three_entries_that_two_top_are_same_has_two_amount_to_pour() {
+        let b = Bottle::with_three_colors(0, Color::Brown, Color::Orange, Color::Orange);
+        assert_eq!(2, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_three_entries_that_three_top_are_same_has_three_amount_to_pour() {
+        let b = Bottle::with_three_colors(0, Color::Orange, Color::Orange, Color::Orange);
+        assert_eq!(3, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_four_entries_that_top_are_different_has_one_amount_to_pour() {
+        let b = Bottle::with_four_colors(0, Color::Orange, Color::Orange, Color::Orange, Color::Blue);
+        assert_eq!(1, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_four_entries_that_top_two_are_same_has_two_amount_to_pour() {
+        let b = Bottle::with_four_colors(0, Color::Orange, Color::Orange, Color::Blue, Color::Blue);
+        assert_eq!(2, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_four_entries_that_top_three_are_same_has_three_amount_to_pour() {
+        let b = Bottle::with_four_colors(0, Color::Orange, Color::Blue, Color::Blue, Color::Blue);
+        assert_eq!(3, b.amount_to_pour())
+    }
+
+    #[test]
+    fn bottle_with_four_entries_that_top_four_are_same_has_four_amount_to_pour() {
+        let b = Bottle::with_four_colors(0, Color::Blue, Color::Blue, Color::Blue, Color::Blue);
+        assert_eq!(4, b.amount_to_pour())
     }
 }
 
