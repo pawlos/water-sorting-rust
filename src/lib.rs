@@ -383,12 +383,14 @@ impl WaterSorting {
         }
 
         let top_colors = self.top_colors();
-        for (src, t1) in top_colors.clone() {
+        for (src_index, t1) in top_colors.clone() {
             let (src_color, _) = t1;
-            for (dst,t2) in top_colors.clone() {
+            for (dst_index,t2) in top_colors.clone() {
                 let (dst_color, dst_is_full) = t2;
-                let pour = Pour::new(src, dst);
-                if src != dst && src_color == dst_color && !dst_is_full && !moves.contains(&pour) {
+                let pour = Pour::new(src_index, dst_index);
+                // do not list as available moves pouring only part of color to different bottle
+                if src_index != dst_index && src_color == dst_color && !dst_is_full && !moves.contains(&pour) &&
+                    self.bottles[src_index].amount_to_pour() <= self.bottles[dst_index].available_empty_space() {
                     return Some(pour)
                 }
             }
