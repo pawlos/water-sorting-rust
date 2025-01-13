@@ -279,18 +279,18 @@ impl WaterSorting {
         }
     }
 
-    pub fn pour(&mut self, from_index: u8, to_index: u8) {
+    pub fn pour(&mut self, from_index: usize, to_index: usize) {
         self.old_state = Some(self.bottles.to_vec());
         loop {
-            match self.bottles[from_index as usize].top_color() {
+            match self.bottles[from_index].top_color() {
                 None => break,
                 Some(b) => {
-                    let to_b = &mut self.bottles[to_index as usize];
+                    let to_b = &mut self.bottles[to_index];
                     let r = to_b.pour(b);
                     if !r {
                         break;
                     }
-                    self.bottles[from_index as usize].pop();
+                    self.bottles[from_index].pop();
                 }
             }
         }
@@ -502,7 +502,7 @@ impl WaterSolver {
             let mut new_w = w.clone();
             let mut new_states = old_states.clone();
             new_moves.push(Pour::new(next_move.from, next_move.to));
-            new_w.pour(next_move.from as u8, next_move.to as u8);
+            new_w.pour(next_move.from, next_move.to);
             if new_states.iter().any(|f| f.eq(&new_w.clone()))
             {
                 return None;
@@ -844,7 +844,7 @@ mod auto_solve_tests {
         assert!(!result.is_empty());
 
         for p in result.iter() {
-            w.pour(p.from as u8, p.to as u8);
+            w.pour(p.from, p.to);
         }
 
         assert!(w.win());
@@ -868,7 +868,7 @@ mod auto_solve_tests {
         assert!(!result.is_empty());
 
         for p in result.iter() {
-            w.pour(p.from as u8, p.to as u8);
+            w.pour(p.from, p.to);
         }
 
         assert!(w.win());
@@ -903,7 +903,7 @@ mod auto_solve_tests {
         assert!(!result.is_empty());
 
         for p in result.iter() {
-            w.pour(p.from as u8, p.to as u8);
+            w.pour(p.from, p.to);
         }
 
         assert!(w.win());
@@ -940,7 +940,7 @@ mod auto_solve_tests {
         assert!(!result.is_empty());
 
         for p in result.iter() {
-            w.pour(p.from as u8, p.to as u8);
+            w.pour(p.from, p.to);
         }
 
         assert!(w.win());
@@ -1210,7 +1210,7 @@ mod water_sorting_tests {
         let moves = solver.solve();
 
         for _move in moves.iter() {
-            w.pour(_move.from as u8, _move.to as u8)
+            w.pour(_move.from, _move.to)
         }
         assert!(w.win());
     }
