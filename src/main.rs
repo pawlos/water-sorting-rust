@@ -30,7 +30,7 @@ pub fn main() {
         let moves = line
             .trim_end()
             .split("->")
-            .filter_map(|x| x.parse::<u8>().ok())
+            .filter_map(|x| x.parse::<usize>().ok())
             .collect::<Vec<_>>();
         if moves.iter().count() != 2 {
             println!("Wrong move!");
