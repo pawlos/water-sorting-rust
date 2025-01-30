@@ -4,8 +4,6 @@ use std::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::*;
 use std::ops::Add;
 
-const MAX_RECURSION: usize = 30;
-
 #[wasm_bindgen]
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Color {
@@ -481,19 +479,19 @@ impl WaterSolver {
         WaterSolver{ level: w.clone() }
     }
 
-    pub fn solve(&self) -> Vec<Pour> {
+    pub fn solve(&self, n: usize) -> Vec<Pour> {
         let moves = Vec::new();
         let new_w = self.level.clone();
         let mut old_states = Vec::new();
         old_states.push(new_w.clone());
-        self.solve_internal(new_w, moves, old_states, 0).unwrap_or_else(|| Vec::new())
+        self.solve_internal(new_w, moves, old_states, n).unwrap_or_else(|| Vec::new())
     }
 
-    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<WaterSorting>, count: usize) -> Option<Vec<Pour>> {
+    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<WaterSorting>, level: usize) -> Option<Vec<Pour>> {
         if w.win() {
             return Some(moves)
         }
-        if count > MAX_RECURSION {
+        if level == 0 {
             return None
         }
         let next_available_moves = w.next_available_moves();
@@ -508,7 +506,7 @@ impl WaterSolver {
                 return None;
             }
             new_states.push(new_w.clone());
-            let result = self.solve_internal(new_w, new_moves, new_states, count+1);
+            let result = self.solve_internal(new_w, new_moves, new_states, level-1);
             match result {
                 None => {}
                 r => return r
@@ -839,7 +837,7 @@ mod auto_solve_tests {
 
         let solver = WaterSolver::new(ref_w);
 
-        let result = solver.solve();
+        let result = solver.solve(10);
 
         assert!(!result.is_empty());
 
@@ -863,7 +861,7 @@ mod auto_solve_tests {
 
         let solver = WaterSolver::new(ref_w);
 
-        let result = solver.solve();
+        let result = solver.solve(10);
 
         assert!(!result.is_empty());
 
@@ -898,7 +896,7 @@ mod auto_solve_tests {
 
         let solver = WaterSolver::new(ref_w);
 
-        let result = solver.solve();
+        let result = solver.solve(5);
 
         assert!(!result.is_empty());
 
@@ -935,7 +933,7 @@ mod auto_solve_tests {
 
         let solver = WaterSolver::new(ref_w);
 
-        let result = solver.solve();
+        let result = solver.solve(5);
 
         assert!(!result.is_empty());
 
@@ -1207,7 +1205,7 @@ mod water_sorting_tests {
 
         let solver = WaterSolver::new(&w);
 
-        let moves = solver.solve();
+        let moves = solver.solve(10);
 
         for _move in moves.iter() {
             w.pour(_move.from, _move.to)
