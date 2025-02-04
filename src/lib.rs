@@ -56,9 +56,9 @@ struct Bottle {
 
 #[wasm_bindgen]
 #[derive(Debug, Copy, Clone)]
-struct Pour {
-    from: usize,
-    to: usize
+pub struct Pour {
+    pub from: usize,
+    pub to: usize
 }
 
 impl Pour {
@@ -470,7 +470,7 @@ impl WaterSorting {
 }
 
 #[wasm_bindgen]
-struct WaterSolver {
+pub struct WaterSolver {
     level: WaterSorting,
 }
 

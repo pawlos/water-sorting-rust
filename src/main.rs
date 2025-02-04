@@ -1,5 +1,5 @@
 use std::io;
-use water_sort::{Color, WaterSorting};
+use water_sort::{Color, WaterSolver, WaterSorting};
 
 pub fn main() {
     let mut w = WaterSorting::new();
@@ -19,7 +19,7 @@ pub fn main() {
             break;
         }
         println!();
-        println!("Provide next move (src -> desc): ");
+        println!("Provide next move (src -> desc) or solve: ");
         let mut line: String = Default::default();
         let result = io::stdin().read_line(&mut line);
 
@@ -27,19 +27,32 @@ pub fn main() {
             break;
         }
 
-        let moves = line
-            .trim_end()
-            .split("->")
-            .filter_map(|x| x.parse::<usize>().ok())
-            .collect::<Vec<_>>();
-        if moves.iter().count() != 2 {
-            println!("Wrong move!");
-            continue;
-        }
+        if line.trim_end() == "solve" {
+            let solver = WaterSolver::new(&w);
+            let solution = solver.solve(20);
+            println!("Solution: ");
+            solution.iter().for_each(|pour| {
+                let from = pour.from;
+                let to = pour.to;
+                println!("{:?}", pour);
+                w.pour(from, to);
+            } );
 
-        let source_no = moves[0] - 1;
-        let destination_no = moves[1] - 1;
-        println!("Pouring...");
-        w.pour(source_no, destination_no);
+        } else {
+            let moves = line
+                .trim_end()
+                .split("->")
+                .filter_map(|x| x.parse::<usize>().ok())
+                .collect::<Vec<_>>();
+            if moves.iter().count() != 2 {
+                println!("Wrong move!");
+                continue;
+            }
+
+            let source_no = moves[0] - 1;
+            let destination_no = moves[1] - 1;
+            println!("Pouring...");
+            w.pour(source_no, destination_no);
+        }
     }
 }
