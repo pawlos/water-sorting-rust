@@ -1,5 +1,5 @@
 import {Color, WaterSorting} from "wasm-water-sort";
-import { memory } from "wasm-water-sort/water_sort_bg"
+import { memory } from "../pkg/water_sort_bg.wasm";
 
 const SIZE = 25;
 const SPACE = 10;
