@@ -1,4 +1,4 @@
-import {Color, WaterSorting} from "wasm-water-sort";
+import {Color, WaterSorting, WaterSolver} from "wasm-water-sort";
 import { memory } from "../pkg/water_sort_bg.wasm";
 
 const SIZE = 25;
@@ -25,18 +25,11 @@ const waterSorting = WaterSorting.new();
 const success = new Audio('success.mp3');
 
 const initialize = (w) => {
-    w.init_bottle_with_four_colors(Color.Purple, Color.Yellow, Color.Purple, Color.Blue);
-    w.init_bottle_with_four_colors(Color.Gray, Color.Red, Color.Magenta, Color.LightBlue);
-    w.init_bottle_with_four_colors(Color.Magenta, Color.Blue, Color.Peach, Color.Gray);
-    w.init_bottle_with_four_colors(Color.LightBlue, Color.Olive, Color.Blue, Color.Peach);
-    w.init_bottle_with_four_colors(Color.Yellow, Color.Orange, Color.Peach, Color.Green);
-    w.init_bottle_with_four_colors(Color.Yellow, Color.Orange, Color.Magenta, Color.Magenta);
-    w.init_bottle_with_four_colors(Color.Teal, Color.Orange, Color.Green, Color.Green);
-    w.init_bottle_with_four_colors(Color.Olive, Color.Purple, Color.Purple, Color.Gray);
-    w.init_bottle_with_four_colors(Color.Orange, Color.Red, Color.Blue, Color.LightBlue);
-    w.init_bottle_with_four_colors(Color.Red, Color.Olive, Color.LightBlue, Color.Teal);
-    w.init_bottle_with_four_colors(Color.Olive, Color.Gray, Color.Teal, Color.Orange);
-    w.init_bottle_with_four_colors(Color.Red, Color.Green, Color.Yellow, Color.Teal);
+    w.init_bottle_with_four_colors(Color.Red, Color.Red, Color.Orange, Color.Blue);
+    w.init_bottle_with_four_colors(Color.Peach, Color.Blue, Color.Peach, Color.Orange);
+    w.init_bottle_with_four_colors(Color.Peach, Color.Blue, Color.Red, Color.Peach);
+    w.init_bottle_with_four_colors(Color.Orange, Color.Teal, Color.Red, Color.Teal);
+    w.init_bottle_with_four_colors(Color.Blue, Color.Teal, Color.Teal, Color.Orange);
     w.init_empty_bottle();
     w.init_empty_bottle();
 };
@@ -45,6 +38,7 @@ initialize(waterSorting);
 const canvas = document.getElementById('water-sorting-canvas');
 const undo_btn = document.getElementById('undo-btn');
 const reset_btn = document.getElementById('reset-btn');
+const solve_btn = document.getElementById('solve-btn');
 const ctx = canvas.getContext('2d');
 
 const bottles_count = waterSorting.bottles_count();
@@ -90,6 +84,20 @@ const reset = () => {
     reset_requested = true;
 }
 reset_btn.onclick = reset;
+
+const solve = (ws) => {
+    const waterSolver = WaterSolver.new(ws);
+    const pours = waterSolver.solution(20);
+    const solutions = new Uint8Array(memory.buffer, pours,  4);
+    const count = solutions[0];
+    const moves = new Uint8Array(memory.buffer, pours,
+    /* 4 B * 2 position per pour + 1 for count */ 4 * count * 2 + 1);
+    for (let i = 1; i < count*2; i+=2) {
+        console.log(moves[i*4], moves[(i+1)*4]);
+    }
+}
+
+solve_btn.onclick = () => solve(waterSorting);
 
 const mouseClick = (ev) => {
     if (waterSorting.win()) return;

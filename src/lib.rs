@@ -472,11 +472,22 @@ impl WaterSorting {
 #[wasm_bindgen]
 pub struct WaterSolver {
     level: WaterSorting,
+    solution: Vec<usize>,
 }
 
+#[wasm_bindgen]
 impl WaterSolver {
     pub fn new(w: &WaterSorting) -> WaterSolver {
-        WaterSolver{ level: w.clone() }
+        WaterSolver{ level: w.clone(), solution: Vec::new() }
+    }
+
+    pub fn solution(&mut self, n: usize) -> *const usize {
+        let solution = self.solve(n);
+        self.solution = solution
+            .iter()
+            .flat_map(|p| [p.from, p.to]).collect::<Vec<_>>();
+        self.solution.insert(0, solution.len());
+        self.solution.as_ptr()
     }
 
     pub fn solve(&self, n: usize) -> Vec<Pour> {
