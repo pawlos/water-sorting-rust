@@ -85,6 +85,15 @@ const reset = () => {
 }
 reset_btn.onclick = reset;
 
+const perform_move = (moves, index) => {
+    if (index < 0 || index >= moves.length) return;
+    const move = moves[index];
+    const from = move.from;
+    const to = move.to;
+    waterSorting.pour(from, to);
+    setTimeout(perform_move, 1000, moves, ++index);
+}
+
 const solve = (ws) => {
     const waterSolver = WaterSolver.new(ws);
     const pours = waterSolver.solution(20);
@@ -92,9 +101,11 @@ const solve = (ws) => {
     const count = solutions[0];
     const moves = new Uint8Array(memory.buffer, pours,
     /* 4 B * 2 position per pour + 1 for count */ 4 * count * 2 + 1);
+    let solution_moves = [];
     for (let i = 1; i < count*2; i+=2) {
-        console.log(moves[i*4], moves[(i+1)*4]);
+        solution_moves.push({from: moves[i*4], to: moves[(i+1)*4]});
     }
+    setTimeout(perform_move, 100, solution_moves, 0);
 }
 
 solve_btn.onclick = () => solve(waterSorting);
