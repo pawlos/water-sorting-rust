@@ -20,7 +20,7 @@ const PURPLE = '#ab64d4'
 const LIGHTBLUE ='#2688ab'
 const PEACH = '#cb9486'
 const OLIVE = '#194e24'
-const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, TEAL, PURPLE, LIGHTBLUE, PEACH, OLIVE];
+const colors = [EMPTY, BLUE, RED, GRAY, ORANGE, BROWN, YELLOW, GREEN, MAGENTA, LIME, TEAL, PURPLE, LIGHTBLUE, PEACH, OLIVE];
 const waterSorting = WaterSorting.new();
 const success = new Audio('success.mp3');
 
@@ -147,7 +147,7 @@ const drawGame = () => {
     }
     if (waterSorting.win()) {
         drawWin();
-        success.play();
+        success.play().then(() => setTimeout(()=>reset_requested = true, 3000));
     } else {
         drawBottles(waterSorting.bottles());
     }
