@@ -158,7 +158,7 @@ const drawGame = () => {
     }
     if (waterSorting.win()) {
         drawWin();
-        success.play().then(() => setTimeout(()=>reset_requested = true, 3000));
+        success.play().then(() => setTimeout(() => reset_requested = true, 3000));
     } else {
         drawBottles(waterSorting.bottles());
     }
