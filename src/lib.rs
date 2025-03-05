@@ -498,26 +498,26 @@ impl WaterSolver {
         self.solve_internal(new_w, moves, old_states, n).unwrap_or_else(|| Vec::new())
     }
 
-    fn solve_internal(&self, w: WaterSorting,  moves: Vec<Pour>, old_states: Vec<WaterSorting>, level: usize) -> Option<Vec<Pour>> {
-        if w.win() {
+    fn solve_internal(&self, existing_state: WaterSorting, moves: Vec<Pour>, old_states: Vec<WaterSorting>, level: usize) -> Option<Vec<Pour>> {
+        if existing_state.win() {
             return Some(moves)
         }
         if level == 0 {
             return None
         }
-        let next_available_moves = w.next_available_moves();
+        let next_available_moves = existing_state.next_available_moves();
         for next_move in next_available_moves {
-            let mut new_moves = moves.clone();
-            let mut new_w = w.clone();
-            let mut new_states = old_states.clone();
-            new_moves.push(Pour::new(next_move.from, next_move.to));
-            new_w.pour(next_move.from, next_move.to);
-            if new_states.iter().any(|f| f.eq(&new_w.clone()))
+            let mut possible_solution = moves.clone();
+            let mut new_state = existing_state.clone();
+            possible_solution.push(Pour::new(next_move.from, next_move.to));
+            new_state.pour(next_move.from, next_move.to);
+            let mut existing_states = old_states.clone();
+            if existing_states.iter().any(|f| f.eq(&new_state.clone()))
             {
                 return None;
             }
-            new_states.push(new_w.clone());
-            let result = self.solve_internal(new_w, new_moves, new_states, level-1);
+            existing_states.push(new_state.clone());
+            let result = self.solve_internal(new_state, possible_solution, existing_states, level-1);
             match result {
                 None => {}
                 r => return r
